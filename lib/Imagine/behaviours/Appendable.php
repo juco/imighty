@@ -1,4 +1,4 @@
 <?php
-class Appendable extends Resizable {
+class Appendable extends Renderizable {
     
 }

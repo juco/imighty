@@ -1,5 +1,5 @@
 <?php
-abstract class Sizable extends Appendable {
+class Sizable extends Appendable {
 
     private
             $height = 0,
@@ -44,17 +44,11 @@ abstract class Sizable extends Appendable {
 
     public function getDimmension() {
 
-        if($this->crop == "crop") {
-            return $this->getBoundaries();
-        }
-        return self::getBoundaries();
-    }
-
-    public function getBoundaries() {
-
         return array(
                 "width" => $this->width,
                 "height" => $this->height
         );
     }
+
+
 }

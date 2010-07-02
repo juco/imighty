@@ -1,5 +1,7 @@
 <?php
 
-class ImagineImage extends Appendable {
-    
+class ImagineImage extends Container {
+    public function prepareDimmension(){
+        
+    }
 }
