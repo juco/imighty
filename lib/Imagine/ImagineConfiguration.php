@@ -1,5 +1,12 @@
 <?php
-class ImInstance extends ImCore {
+
+/*
+ *
+ * Configuration For the Imagine, será cargado desde pertenecerá a ImagineCore
+ *
+ *
+ */
+class ImagineConfiguration {
 
     protected $options = array();
  
