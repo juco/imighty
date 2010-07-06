@@ -5,19 +5,28 @@
  * Configuration For the Imagine, será cargado desde pertenecerá a ImagineCore
  *
  *
- */
+*/
 class ImagineConfiguration {
 
+    protected static
+            $settings = array(
+                "output_dir" => "",
+                "input_dir" => "",
+                "renderer" => "gdRenderer"
+            ),
+            $protected_options = array();
     protected $options = array();
- 
-    public function __construct($options) {
-        if(false === self::$_core_initialized) {
-            self::initCore();
-        }
+
+    public function __construct($options = array()) {
+
         $this->options = self::$settings;
 
         foreach($options as $key => $value) {
-            $this->$key = $value;
+            if(in_array($key, array_keys($this->options))) {
+                $this->$key = $value;
+            } else {
+                throw new Exception("Wrong options passed.");
+            }
         }
 
     }
@@ -26,12 +35,7 @@ class ImagineConfiguration {
         if(!key_exists($name, $this->options)) {
             throw new Exception ("set Unknown option: ".$name);
         }
-        if(isset(self::$protected_option_values[$name])){
-            $values = self::$protected_option_values[$name];
-            if(!in_array($value, $values)){
-                throw new Exception("Valor no permitido: ".$name." => ".$value.", sólo permitidos: ".implode(", ", $values));
-            }
-        }
+
         $this->options[$name] = $value;
     }
     public function __get($name) {
@@ -39,18 +43,15 @@ class ImagineConfiguration {
             throw new Exception("get Unknown option: ". $name);
         }
 
-        if(in_array($name, self::$protected_options)) {
-            throw new Exception("protected option: ".$name);
-        }
         return $this->options[$name];
     }
 
     public function __call($name,  $arguments) {
-        
+
         $property = $this->decamelize($name);
 
         if(key_exists($property, $this->options)) {
-            
+
             if(sizeof($arguments) == 0) {
 
                 return $this->$property;
@@ -59,7 +60,7 @@ class ImagineConfiguration {
 
                 $this->$property = $arguments[0];
                 return $this;
-                
+
             } else {
 
                 throw new Exception("Only one argument for this setter: ".$name);

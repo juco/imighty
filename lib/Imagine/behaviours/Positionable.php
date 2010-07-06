@@ -70,20 +70,19 @@ class Positionable extends Sizable {
     }
 
     public function getBoundaries() {
-
+        
         $boundaries = array();
         $borders = self::$borders;
-
+        $dimmension = parent::getDimmension();
         foreach($borders as $border => $options) {
-
+            $opposite = $temp = $options["opposite"];
             if(false === $this->$border) {
-                $temp = $options["opposite"];
                 $opposite = $border;
                 $border = $temp;
                 unset($temp, $borders[$border]);
             }
             $boundaries[$border] = $this->$border;
-            $boundaries[$opposite] = $this->$options["orientation"] * $options["operator"] + $this->$border;
+            $boundaries[$opposite] = $dimmension[$options["orientation"]] * $options["operator"] + $this->$border;
 
         }
 

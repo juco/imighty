@@ -1,5 +1,5 @@
 <?php
-abstract class Container extends Positionable {
+class Container extends Positionable {
 
     private $children = array();
 
@@ -12,15 +12,17 @@ abstract class Container extends Positionable {
     }
 
     public function render() {
-        foreach(self::$children as $child) {
-            $this->addToRenderStack($child->render()->getImage());
+        $this->clearRenderStack();
+        foreach($this->children as $child) {
+            $this->addToRenderStack($child->render());
         }
 
         return parent::render();
     }
 
     public function getBoundaries() {
-
+        
+        $boundaries = parent::getBoundaries();
         $borders = $this->getBorders();
         foreach($this->children as $child) {
             $child_boundaries = $child->getBoundaries();
@@ -29,24 +31,22 @@ abstract class Container extends Positionable {
                     $boundaries[$border] = $child_boundaries[$border];
                 }
             }
-            $dimm["width"] = $dimm["width"]?$dimm["width"]:($cdimm["width"] + $cpos["left"]);
-            $dimm["height"] = $dimm["height"]?$dimm["height"]:($cdimm["height"] + $cpos["top"]);
-
         }
         return $boundaries;
     }
 
     public function getDimmension() {
-        
+  
+        $boundaries = self::getBoundaries();
         $dimmension = parent::getDimmension();
-        $boundaries = $this->getBoundaries();
-
-        if($dimmension["width"] == 0) {
-            $dimmension["width"] = $boundaries["left"] - $boundaries["right"];
+        
+        if($dimmension["width"] === 0) {
+            $dimmension["width"] = $boundaries["right"] - $boundaries["left"];
         }
-        if($dimmension["height"] == 0) {
-            $dimmension["height"] = $boundaries["top"] - $boundaries["bottom"];
+        if($dimmension["height"] === 0) {
+            $dimmension["height"] = $boundaries["bottom"] - $boundaries["top"];
         }
+        return $dimmension;
     }
-    abstract protected function prepareDimmension();
+    
 }

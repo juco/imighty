@@ -1,12 +1,19 @@
 <?php
 
 require_once('../lib/Imagine.php');
-Imagine::register();
+
+$imagine_configuration = new ImagineConfiguration(array(
+                "input_dir" => __DIR__."/images/",
+                "output_dir" => __DIR__."/thumbs/"
+));
+Imagine::register($imagine_configuration);
+
 
 $layer = Imagine::layer();
 
 $image = Imagine::image()->
-        width("250")->
+loadFile("vertical.jpg")->
+width("250")->
         height("300")->
         bottom(2)->
         right(3);
@@ -14,4 +21,7 @@ $image = Imagine::image()->
 
 $layer->append($image);
 
+$layer->saveFile("vertical.jpg");
+
 var_dump($layer->getDimmension());
+//var_dump($layer->getBoundaries());

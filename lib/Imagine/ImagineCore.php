@@ -8,6 +8,10 @@ class ImagineCore {
             $registered_tools = array(),
             $imagine_dir = "";
 
+    private static $configuration = false;
+
+    
+
     public static function registerLayers($name, $class) {
 
         if(!in_array($name, array_keys(self::$registered))) {
@@ -20,8 +24,12 @@ class ImagineCore {
         if(!in_array($name, array_keys(self::$registered_tools))) {
             throw new Exception("Module not loaded: ".$name);
         }
-        $argument = sizeof($arguments)?$arguments[0]:null;
-        return new self::$registered_tools[$name]($argument);
+
+        $reflection = new ReflectionClass(self::$registered_tools[$name]);
+        if(0 === sizeof($arguments)){
+            $arguments = null;
+        }
+        return $reflection->newInstance($arguments);
     }
 
     public static function registerAutoload($dirs = array()) {
@@ -42,12 +50,25 @@ class ImagineCore {
 
         spl_autoload_register(array("ImagineCore", "autoload"));
     }
-
-    public static function register() {
-
+    public static function isRegistered() {
+        return (false !== self::$registered);
+    }
+    public function register($configuration = false) {
         if(false !== self::$registered) {
             return;
         }
+
+        if(false !== $configuration) {
+            
+            if(get_class($configuration) == "ImagineConfiguration" || is_subclass_of($configuration, "ImagineConfiguration")) {
+                self::$configuration = $configuration;
+            } else {
+                throw new Exception("Wrong configuration passed.");
+            }
+        } else {
+            self::$configuration = new ImagineConfiguration();
+        }
+
 
         $class = get_called_class();
 
@@ -71,9 +92,11 @@ class ImagineCore {
         }
         self::$registered = true;
     }
-
+    public static function getConfiguration(){
+        return self::$configuration;
+    }
     public static function autoload($class) {
-        
+
         if(!isset(self::$classes[$class])) {
             return false;
         }
