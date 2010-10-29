@@ -94,11 +94,12 @@ class gdRenderer implements Renderer {
         }
         
         $resource = $this->imagedata["resource"];
-        var_dump($this->imagedata);
-        header("Content-Type: image/png;");
-        imagealphablending($resource, false);
-        imagesavealpha($resource, true);
-        imagepng($resource);
+        //header("Content-Type: image/png;");
+        //imagealphablending($resource, false);
+        //imagesavealpha($resource, true);
+        
+        imagepng($resource, $new_filename);
+        
     }
 
 

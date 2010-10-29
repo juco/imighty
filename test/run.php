@@ -1,30 +1,30 @@
 <?php
 
+include('../lib/Imagine.php');
 
-
-$pub_dir = sfConfig::get("sf_web_dir");
-$output_dir = $pub_dir."/images/thumbnails";
-
-ImLayer::registerFont("arial_italic_bold", array(
-        "file" => "Arial.ttf",
-        "default_style" => "italic bold 12px/16px",
-        "default_color" => "#000"
-));
-
-// Coge la primera fuente registrada por defecto.
-
-$text = ImLayer::text("Hola, esto es texto")->
-        bottom(10)->
-        right(0)->
-        padding(10)->
-        position("absolute")->
-        background("#66ffffff");
+//$pub_dir = sfConfig::get("sf_web_dir");
+//$output_dir = $pub_dir."/images/thumbnails";
+//
+//ImLayer::registerFont("arial_italic_bold", array(
+//        "file" => "Arial.ttf",
+//        "default_style" => "italic bold 12px/16px",
+//        "default_color" => "#000"
+//));
+//
+//// Coge la primera fuente registrada por defecto.
+//
+//$text = ImLayer::text("Hola, esto es texto")->
+//        bottom(10)->
+//        right(0)->
+//        padding(10)->
+//        position("absolute")->
+//        background("#66ffffff");
 
 $im = ImLayer::image($pub_dir."/images/test_0.jpg")->
         width(300)->
         height(300)->
         crop()-> // fit()
-        append($text)->
+        //append($text)->
         output();
 
 
@@ -32,7 +32,7 @@ $im = ImLayer::image($pub_dir."/images/test_0.jpg")->
 //
 // 1.- cargar una imagen
 // 2.- convertir en una imagen de 640 de ancho y 300 de máximo de alto
-
+/*
 
 
 // Configure
