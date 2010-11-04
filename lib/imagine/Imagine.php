@@ -1,7 +1,7 @@
 <?php
 
-require_once(dirname(__FILE__)."/Imagine/ImagineCore.php");
-require_once(dirname(__FILE__)."/Imagine/ImagineConfiguration.php");
+require_once("ImagineCore.php");
+require_once("ImagineConfiguration.php");
 
 class Imagine extends ImagineCore {
     

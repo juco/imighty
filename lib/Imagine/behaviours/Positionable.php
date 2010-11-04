@@ -6,7 +6,8 @@ class Positionable extends Sizable {
             $left = 0,
             $right = false,
             $bottom = false,
-            $position = "relative";
+            $position = "relative",
+            $parent = false;
 
     private static $borders = array(
             "top" => array(
@@ -35,7 +36,7 @@ class Positionable extends Sizable {
     /*
      *
     */
-    // TODO: This should be non magic
+    // TODO: This should be not magic
 
     public function  __call($border,  $arguments) {
 
@@ -59,7 +60,15 @@ class Positionable extends Sizable {
             return $this;
         }
     }
-
+    public function getParent() {
+        return $this->parent;
+    }
+    public function setParent($parent) {
+        $this->parent = $parent;
+    }
+    public function hasParent() {
+        return (false !== $this->parent);
+    }
     public function getPosition() {
         return array(
                 "left" => $this->left,
@@ -70,26 +79,44 @@ class Positionable extends Sizable {
     }
 
     public function getBoundaries() {
-        
+        if(!$this->hasParent()) {
+            return array(
+                    "left" => 0,
+                    "right" => $this->width(),
+                    "top" => 0,
+                    "bottom" => $this->height()
+            );
+        }
         $boundaries = array();
-        $borders = self::$borders;
-        $dimmension = parent::getDimmension();
-        foreach($borders as $border => $options) {
-            $opposite = $temp = $options["opposite"];
-            if(false === $this->$border) {
-                $opposite = $border;
-                $border = $temp;
-                unset($temp, $borders[$border]);
-            }
-            $boundaries[$border] = $this->$border;
-            $boundaries[$opposite] = $dimmension[$options["orientation"]] * $options["operator"] + $this->$border;
+        $borders = $this->getBorders();
 
+        $pdim = $this->getParent()->getDimmension();
+        $dim = parent::getDimmension();
+        foreach($borders as $border => $options) {
+            if(isset($borders[$border])) {
+                $opposite = $temp = $options["opposite"];
+                if(false === $this->$border) {
+                    $opposite = $border;
+                    $border = $temp;
+                }
+                unset($temp);
+                $boundaries[$border] = $this->$border;
+                $add = $this->$border + $dim[$options['orientation']];
+                $boundaries[$opposite] = $pdim[$options["orientation"]] - $add  * $options["operator"];
+                unset($borders[$border], $borders[$opposite]);
+            }
         }
 
         return $boundaries;
     }
-
-    public function getBorders(){
+    public function render() {
+        if($this->hasParent()) {
+            $boundaries = $this->getBoundaries();
+            $this->getRenderer()->setPosition($boundaries);
+        }
+        parent::render();
+    }
+    public function getBorders() {
         return self::$borders;
     }
 

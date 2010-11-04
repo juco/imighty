@@ -1,43 +1,33 @@
 <?php
+
 class Container extends Positionable {
 
     private $children = array();
 
     public function append(&$element) {
         if(is_subclass_of($element, "Positionable")) {
+            $element->setParent($this);
             array_push($this->children, $element);
         } else {
             throw new Exception("Unknown type of element: ".get_class($element));
         }
+        return $this;
     }
 
     public function render() {
         $this->clearRenderStack();
         foreach($this->children as $child) {
-            $this->addToRenderStack($child->render());
+            $child->render();
+            $this->addToRenderStack($child->getRenderer());
         }
 
         return parent::render();
     }
 
-    public function getBoundaries() {
-        
-        $boundaries = parent::getBoundaries();
-        $borders = $this->getBorders();
-        foreach($this->children as $child) {
-            $child_boundaries = $child->getBoundaries();
-            foreach(array_keys($borders) as $border) {
-                if($this->cmp($boundaries[$border], $child_boundaries[$border]) === $borders[$border]["operator"]) {
-                    $boundaries[$border] = $child_boundaries[$border];
-                }
-            }
-        }
-        return $boundaries;
-    }
 
     public function getDimmension() {
-  
-        $boundaries = self::getBoundaries();
+        
+        $boundaries = $this->getBoundaries();
         $dimmension = parent::getDimmension();
         
         if($dimmension["width"] === 0) {

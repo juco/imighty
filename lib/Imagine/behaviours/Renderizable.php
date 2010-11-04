@@ -4,18 +4,21 @@ class Renderizable {
             $renderer,
             $is_rendered = false;
 
-    public function  __construct() {
-        $renderer_class = Imagine::getConfiguration()->renderer;
+    public function  __construct($imagine) {
+        $this->imagine = $imagine;
+        $renderer_class = $this->imagine->getConfiguration()->renderer;
         $reflection_class = new ReflectionClass($renderer_class);
-        $this->renderer = $reflection_class->newInstance();
+        $this->renderer = $reflection_class->newInstance($imagine);
     }
+
     public function render() {
         // TODO: filters here add to renderStack Wha
 
         $this->is_rendered = true;
         
-        return $this->getRenderer()->render();
+        $this->getRenderer()->render();
     }
+    
     public function getRenderer() {
         return $this->renderer;
     }

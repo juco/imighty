@@ -1,17 +1,47 @@
 <?php
-class gdRenderer implements Renderer {
+class gdRenderer extends Renderer {
     protected $imagedata = false;
     protected $outputdata = false;
     protected $is_rendered = false;
     protected $render_stack = array();
-
-
-    public function  __construct() {
+    protected $imagine;
+    protected $to_dimmension = array(
+            'width' => 0,
+            'height' => 0
+    );
+    protected $offset = array('top' => 0, 'left' => 0);
+    protected $to_position = array(
+            'top' => 0,
+            'left' => 0
+    );
+    public function  __construct($imagine) {
         if(false === self::$_core_initialized) {
             self::initCore();
         }
+        $this->imagine = $imagine;
     }
 
+    public function setDimmension($dimmension) {
+
+        $this->to_dimmension = $dimmension;
+    }
+    public function getDimmension() {
+        return array("width" => $this->imagedata['width'], 'height' => $this->imagedata['height']);
+    }
+    public function setPosition($position) {
+        foreach(array_keys($this->to_position) as $key) {
+            $this->to_position[$key] = $position[$key];
+        }
+    }
+    public function getPosition() {
+        return $this->to_position;
+    }
+    public function setOffset($offset) {
+        $this->offset = $offset;
+    }
+    public function getOffset($border) {
+        return $this->offset[$border];
+    }
     public function loadFile($filename = "") {
         $types = self::$_types;
         $_imagecreatefunction = self::$_core_settings["_imagecreatefunction"];
@@ -20,7 +50,7 @@ class gdRenderer implements Renderer {
             throw new Exception("No se han recibido los tipos de archivo, imagecreatefunction: ".$_imagecreatefunction);
         }
 
-        $configuration = Imagine::getConfiguration();
+        $configuration = $this->imagine->getConfiguration();
         if(false !== $configuration->input_dir) {
             $new_filename = rtrim($configuration->input_dir, "/")."/".ltrim($filename, "/");
         }
@@ -75,13 +105,13 @@ class gdRenderer implements Renderer {
                 throw new Exception('Imagetype not supported.');
                 return null;
         }
-        
+
         $this->imagedata = $imagedata;
-        
+
     }
 
     public function saveFile($filename) {
-        $configuration = Imagine::getConfiguration();
+        $configuration = $this->imagine->getConfiguration();
         if(false !== $configuration->output_dir) {
             $new_filename = rtrim($configuration->output_dir, "/")."/".ltrim($filename, "/");
         }
@@ -92,14 +122,14 @@ class gdRenderer implements Renderer {
                 throw new Exception("Not a dir: ".dirname($filename));
             }
         }
-        
+
         $resource = $this->imagedata["resource"];
         //header("Content-Type: image/png;");
         //imagealphablending($resource, false);
         //imagesavealpha($resource, true);
-        
+
         imagepng($resource, $new_filename);
-        
+
     }
 
 
@@ -108,20 +138,56 @@ class gdRenderer implements Renderer {
         array_push($this->render_stack, $renderer);
     }
     public function render() {
-        
-        foreach($this->render_stack as $renderer){
+        $this->resize();
+        foreach($this->render_stack as $renderer) {
             $this->mix($renderer);
         }
+
     }
-    public function clearRenderStack(){
+    public function resize() {
+        $width = $this->to_dimmension['width']? $this->to_dimmension['width']:$this->imagedata['width'];
+        $height = $this->to_dimmension['height']? $this->to_dimmension['height']:$this->imagedata['height'];
+        $new_image = imagecreatetruecolor($width, $height);
+        imagecopyresampled(
+                $new_image,
+                $this->imagedata['resource'],
+                0,
+                0,
+                $this->getOffset('left'),
+                5,
+                $width,
+                $height,
+                $this->imagedata['width'],
+                $this->imagedata['height']
+        );
+        $this->imagedata['width'] = $width;
+        $this->imagedata['height'] = $height;
+        $this->imagedata['resource'] = $new_image;
+    }
+    public function clearRenderStack() {
         $this->render_stack = array();
     }
-    public function mix($renderer){
-        $res = $renderer->getResource();
-
+    public function mix($renderer) {
+        $renderer->resize();
+        $position = $renderer->getPosition();
+        imagecopy(
+                $this->imagedata['resource'],
+                $renderer->getResource(),
+                $position['left'],
+                $position['top'],
+                0,
+                0,
+                $renderer->getWidth(),
+                $renderer->getHeight()
+        );
     }
-
-    public function getResource(){
+    public function getWidth() {
+        return $this->imagedata["width"];
+    }
+    public function getHeight() {
+        return $this->imagedata["height"];
+    }
+    public function getResource() {
         return $this->imagedata["resource"];
     }
 
@@ -186,8 +252,4 @@ class gdRenderer implements Renderer {
         self::$_core_settings = $settings;
         self::$_core_initialized = true;
     }
-
-
-
-
 }

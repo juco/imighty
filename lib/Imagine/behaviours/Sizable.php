@@ -1,5 +1,5 @@
 <?php
-class Sizable extends Appendable {
+class Sizable extends Renderizable {
 
     private
             $height = 0,
@@ -7,11 +7,7 @@ class Sizable extends Appendable {
             $crop = "stretch";
 
 
-    //Override with pre size threatment
-    
-    public function preRenderSize() {
-        return false;
-    }
+
 
     public function height($height = false) {
 
@@ -48,17 +44,49 @@ class Sizable extends Appendable {
         $this->crop = "stretch";
         return $this;
     }
+    public function render() {
+        $dimmension = $this->getDimmension();
+        $ratio = $dimmension['height'] / $dimmension['width'];
+        $rdr_dimmension = $this->getRenderer()->getDimmension();
+        $rdr_ratio = $rdr_dimmension['height'] / $rdr_dimmension['width'];
+        if($this->crop === "crop" || $this->crop === "fit") {
+            
+            $offset = array('top' => 0, 'left' => 0);
+            $ratio = $dimmension['height'] / $dimmension['width'];
+            $rdr_dimmension = $this->getRenderer()->getDimmension();
+            $rdr_ratio = $rdr_dimmension['height'] / $rdr_dimmension['width'];
+            $has_horiz_offset = $ratio > $rdr_ratio;
+            if($this->crop === "crop"){
+                if($has_horiz_offset){
+                    $propor = $this->getRenderer()->getWidth() / $dimmension['width'];
+                    $offset['left'] = ($dimmension['height'] / $rdr_ratio - $dimmension['width']) * $propor;
+                } else {
+                    $propor = $this->getRenderer()->getHeight() / $dimmension['height'];
+                    $offset['top'] = ($dimmension['width'] * $rdr_ratio - $dimmension['height']) * $propor;
+                }
+            } else if($this->crop === "fit"){
 
-    public function getDimmension() {
-
-        if(is_array($pre_render = $this->preRenderSize())){
-            if(isset($pre_render["height"], $pre_render["width"])){
-                return $pre_render;
-            } else {
-                throw new Exception("Wrong size format on: ".var_export($pre_render, true));
             }
+            
+            $this->getRenderer()->setOffset($offset);
         }
-        
+        $this->getRenderer()->setDimmension($dimmension);
+        parent::render();
+
+    }
+    public function getDimmension() {
+        $rdim = $this->getRenderer()->getDimmension();
+        if(!$this->width && !$this->height) {
+            return $rdim;
+        }
+
+        $prop = $rdim['height'] / $rdim['width'];
+
+        if(!$this->width) {
+            $this->width = $this->height / $prop;
+        } else if(!$this->height) {
+            $this->height = $this->width * $prop;
+        }
         return array(
                 "width" => $this->width,
                 "height" => $this->height

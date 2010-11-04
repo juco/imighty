@@ -1,72 +1,87 @@
 <?php
 
 class ImagineCore {
-
     protected static
             $classes = array(),
+            $registered_autoload_dirs = array();
+
+    protected
             $registered = false,
             $registered_tools = array(),
             $imagine_dir = "";
 
-    private static $configuration = false;
+    private $configuration = false;
 
-    
+    public static function getInstance($configuration = false) {
+        $class = get_called_class();
 
-    public static function registerLayers($name, $class) {
+        $imagine = new $class();
+        $imagine->register($configuration);
+        return $imagine;
+    }
 
-        if(!in_array($name, array_keys(self::$registered))) {
-            self::$registered_tools[$name] = $class;
+    public function registerLayers($name, $class) {
+
+        if(!in_array($name, array_keys($this->registered))) {
+            $this->registered_tools[$name] = $class;
         }
     }
 
-    public static function __callStatic($name, $arguments) {
+    public function __call($name, $arguments) {
 
-        if(!in_array($name, array_keys(self::$registered_tools))) {
+        if(!in_array($name, array_keys($this->registered_tools))) {
             throw new Exception("Module not loaded: ".$name);
         }
 
-        $reflection = new ReflectionClass(self::$registered_tools[$name]);
-        if(0 === sizeof($arguments)){
-            $arguments = null;
-        }
-        return $reflection->newInstance($arguments);
+        $reflection = new ReflectionClass($this->registered_tools[$name]);
+
+        array_unshift($arguments, $this);
+        
+        return $reflection->newInstanceArgs($arguments);
     }
 
-    public static function registerAutoload($dirs = array()) {
+    public function registerAutoload($dirs = array()) {
 
+        if(!sizeof(self::$registered_autoload_dirs)){
+            spl_autoload_register(array("ImagineCore", "autoload"));
+        }
         array_push($dirs, dirname(__FILE__));
 
         foreach($dirs as $dir) {
-            if(!is_dir($dir)) {
-                throw new Exception($dir." is not a directory.");
+            if(!in_array($dir, self::$registered_autoload_dirs)) {
+
+                if(!is_dir($dir)) {
+                    throw new Exception($dir." is not a directory.");
+                }
+
+                $files = self::rglob("*.php", $dir);
+                $classes = array();
+                foreach($files as $file) {
+                    $classes[substr(basename($file), 0, -4)] = $file;
+                }
+                self::$classes = array_merge(self::$classes, $classes);
+                array_push(self::$registered_autoload_dirs, $dir);
             }
-            $files = self::rglob("*.php", $dir);
-            $classes = array();
-            foreach($files as $file) {
-                $classes[substr(basename($file), 0, -4)] = $file;
-            }
-            self::$classes = array_merge(self::$classes, $classes);
         }
 
-        spl_autoload_register(array("ImagineCore", "autoload"));
     }
-    public static function isRegistered() {
-        return (false !== self::$registered);
+    public function isRegistered() {
+        return (true === $this->registered);
     }
     public function register($configuration = false) {
-        if(false !== self::$registered) {
-            return;
+        if(false !== $this->registered) {
+            throw new Exception("Already registered.");
         }
 
         if(false !== $configuration) {
-            
+
             if(get_class($configuration) == "ImagineConfiguration" || is_subclass_of($configuration, "ImagineConfiguration")) {
-                self::$configuration = $configuration;
+                $this->configuration = $configuration;
             } else {
                 throw new Exception("Wrong configuration passed.");
             }
         } else {
-            self::$configuration = new ImagineConfiguration();
+            $this->configuration = new ImagineConfiguration();
         }
 
 
@@ -75,7 +90,7 @@ class ImagineCore {
         if(method_exists($class, "configureAutoload")) {
             $dirs = call_user_func($class."::configureAutoload");
         }
-        self::registerAutoload($dirs);
+       $this->registerAutoload($dirs);
 
         if(method_exists($class, "configureTools")) {
 
@@ -87,13 +102,13 @@ class ImagineCore {
                         throw new Exception($tool_name." tool cannot be defined, reserved name.");
                     }
                 }
-                self::$registered_tools = $tools;
+                $this->registered_tools = $tools;
             }
         }
-        self::$registered = true;
+        $this->registered = true;
     }
-    public static function getConfiguration(){
-        return self::$configuration;
+    public function getConfiguration() {
+        return $this->configuration;
     }
     public static function autoload($class) {
 
@@ -113,5 +128,10 @@ class ImagineCore {
             $files = array_merge($files, self::rglob($pattern, $path, $flags));
         }
         return $files;
+    }
+    public static function dump($data){
+        if(is_array($data) || is_object($data)){
+            var_dump($data);
+        }
     }
 }

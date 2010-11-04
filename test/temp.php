@@ -1,30 +1,30 @@
 <?php
 
-require_once('../lib/Imagine.php');
+require_once('../lib/imagine/Imagine.php');
 
-
-
-$imagine_configuration = new ImagineConfiguration(array(
+$imagine = Imagine::getInstance(new ImagineConfiguration(array(
                 "input_dir" => __DIR__."/images/",
                 "output_dir" => __DIR__."/thumbs/"
-));
+)));
 
-Imagine::register($imagine_configuration);
+$include = $imagine->image()->loadFile("vertical.jpg")->
+        height(70)->
+        width(70)->
+        crop()->
+        top(20)->
+        left(20);
+$image = $imagine->image()->
+        loadFile("horizontal.jpg")->
+        height("250")->
 
-
-//$layer = Imagine::layer();
-
-$image = Imagine::image()->
-loadFile("vertical.jpg")->
-width("250")->
-        height("300")->
-        bottom(2)->
-        right(3);
-
-
-//$layer->append($image);
+        append($include);
 
 $image->saveFile("vertical.jpg");
 
-//var_dump($image->getDimmension());
-//var_dump($layer->getBoundaries());
+?>
+<html>
+    <body>
+        <br />
+        <img alt="vertical" src="thumbs/vertical.jpg" />
+    </body>
+</html>
