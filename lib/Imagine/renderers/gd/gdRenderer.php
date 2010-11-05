@@ -148,13 +148,23 @@ class gdRenderer extends Renderer {
         $width = $this->to_dimmension['width']? $this->to_dimmension['width']:$this->imagedata['width'];
         $height = $this->to_dimmension['height']? $this->to_dimmension['height']:$this->imagedata['height'];
         $new_image = imagecreatetruecolor($width, $height);
+        var_dump(array(
+
+
+                $this->getOffset('left'),
+                $this->getOffset('top'),
+                $width,
+                $height,
+                $this->imagedata['width'],
+                $this->imagedata['height'])
+                );
         imagecopyresampled(
                 $new_image,
                 $this->imagedata['resource'],
                 0,
                 0,
                 $this->getOffset('left'),
-                5,
+                $this->getOffset('top'),
                 $width,
                 $height,
                 $this->imagedata['width'],

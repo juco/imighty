@@ -58,10 +58,14 @@ class Sizable extends Renderizable {
             $has_horiz_offset = $ratio > $rdr_ratio;
             if($this->crop === "crop"){
                 if($has_horiz_offset){
-                    $propor = $this->getRenderer()->getWidth() / $dimmension['width'];
+                    $propor = $this->getRenderer()->getHeight() / $dimmension['height'];
                     $offset['left'] = ($dimmension['height'] / $rdr_ratio - $dimmension['width']) * $propor;
                 } else {
-                    $propor = $this->getRenderer()->getHeight() / $dimmension['height'];
+                    echo "ratio: ".$rdr_ratio."<br />";
+                    echo "dimentionh: ".$dimmension['height'];
+                    
+                    $propor = $this->getRenderer()->getWidth() / $dimmension['width'];
+                    echo "propor: ".$propor;
                     $offset['top'] = ($dimmension['width'] * $rdr_ratio - $dimmension['height']) * $propor;
                 }
             } else if($this->crop === "fit"){
