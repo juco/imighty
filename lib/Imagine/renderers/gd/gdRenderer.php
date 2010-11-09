@@ -1,19 +1,12 @@
 <?php
 class gdRenderer extends Renderer {
-    protected $imagedata = false;
-    protected $outputdata = false;
-    protected $is_rendered = false;
-    protected $render_stack = array();
-    protected $imagine;
-    protected $to_dimmension = array(
-            'width' => 0,
-            'height' => 0
-    );
-    protected $offset = array('top' => 0, 'left' => 0);
-    protected $to_position = array(
-            'top' => 0,
-            'left' => 0
-    );
+    protected
+            $imagedata = false,
+            $outputdata = false,
+            $is_rendered = false,
+            $render_stack = array(),
+            $imagine;
+    
     public function  __construct($imagine) {
         if(false === self::$_core_initialized) {
             self::initCore();
@@ -21,27 +14,6 @@ class gdRenderer extends Renderer {
         $this->imagine = $imagine;
     }
 
-    public function setDimmension($dimmension) {
-
-        $this->to_dimmension = $dimmension;
-    }
-    public function getDimmension() {
-        return array("width" => $this->imagedata['width'], 'height' => $this->imagedata['height']);
-    }
-    public function setPosition($position) {
-        foreach(array_keys($this->to_position) as $key) {
-            $this->to_position[$key] = $position[$key];
-        }
-    }
-    public function getPosition() {
-        return $this->to_position;
-    }
-    public function setOffset($offset) {
-        $this->offset = $offset;
-    }
-    public function getOffset($border) {
-        return $this->offset[$border];
-    }
     public function loadFile($filename = "") {
         $types = self::$_types;
         $_imagecreatefunction = self::$_core_settings["_imagecreatefunction"];
@@ -134,52 +106,36 @@ class gdRenderer extends Renderer {
 
 
 
-    public function addToRenderStack($renderer) {
-        array_push($this->render_stack, $renderer);
-    }
-    public function render() {
-        $this->resize();
-        foreach($this->render_stack as $renderer) {
-            $this->mix($renderer);
-        }
 
-    }
+
     public function resize() {
-        $width = $this->to_dimmension['width']? $this->to_dimmension['width']:$this->imagedata['width'];
-        $height = $this->to_dimmension['height']? $this->to_dimmension['height']:$this->imagedata['height'];
+        $offset = $this->getRenderOption('offset');
+        $multiplier = $this->getRenderOption('multiplier');
+        $dimmension = $this->getRenderOption('dimmension');
+        $width = $dimmension['width']? $dimmension['width']:$this->imagedata['width'];
+        $height = $dimmension['height']? $dimmension['height']:$this->imagedata['height'];
         $new_image = imagecreatetruecolor($width, $height);
-        var_dump(array(
-
-
-                $this->getOffset('left'),
-                $this->getOffset('top'),
-                $width,
-                $height,
-                $this->imagedata['width'],
-                $this->imagedata['height'])
-                );
+        
         imagecopyresampled(
                 $new_image,
                 $this->imagedata['resource'],
                 0,
                 0,
-                $this->getOffset('left'),
-                $this->getOffset('top'),
+                $offset['left'] * $multiplier['left'],
+                $offset['top'] * $multiplier['top'],
                 $width,
                 $height,
-                $this->imagedata['width'],
-                $this->imagedata['height']
+                $this->imagedata['width'] - $offset['left'],
+                $this->imagedata['height'] - $offset['top']
         );
         $this->imagedata['width'] = $width;
         $this->imagedata['height'] = $height;
         $this->imagedata['resource'] = $new_image;
     }
-    public function clearRenderStack() {
-        $this->render_stack = array();
-    }
-    public function mix($renderer) {
-        $renderer->resize();
-        $position = $renderer->getPosition();
+
+    public function mix($child) {
+        $renderer = $child->getRenderer();
+        $position = $renderer->getRenderOption('boundaries');
         imagecopy(
                 $this->imagedata['resource'],
                 $renderer->getResource(),
@@ -190,6 +146,9 @@ class gdRenderer extends Renderer {
                 $renderer->getWidth(),
                 $renderer->getHeight()
         );
+    }
+    public function getDimmension() {
+        return array("width" => $this->imagedata['width'], 'height' => $this->imagedata['height']);
     }
     public function getWidth() {
         return $this->imagedata["width"];

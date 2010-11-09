@@ -37,7 +37,10 @@ class Positionable extends Sizable {
      *
     */
     // TODO: This should be not magic
-
+    protected function configure(){
+        $this->configureRenderOption('boundaries');
+        parent::configure();
+    }
     public function  __call($border,  $arguments) {
 
         if(in_array($border, array_keys(self::$borders))) {
@@ -58,6 +61,8 @@ class Positionable extends Sizable {
             $this->$opp = false;
             $this->$border = $value;
             return $this;
+        } else {
+            throw new Exception($border.' is not a property');
         }
     }
     public function getParent() {
@@ -111,8 +116,7 @@ class Positionable extends Sizable {
     }
     public function render() {
         if($this->hasParent()) {
-            $boundaries = $this->getBoundaries();
-            $this->getRenderer()->setPosition($boundaries);
+            $this->setRenderOption("boundaries", $this->getBoundaries());
         }
         parent::render();
     }

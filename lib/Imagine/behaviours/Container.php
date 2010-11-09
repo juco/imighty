@@ -18,7 +18,7 @@ class Container extends Positionable {
         $this->clearRenderStack();
         foreach($this->children as $child) {
             $child->render();
-            $this->addToRenderStack($child->getRenderer());
+            $this->addToRenderStack($child);
         }
 
         return parent::render();

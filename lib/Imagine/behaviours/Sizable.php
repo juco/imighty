@@ -4,7 +4,9 @@ class Sizable extends Renderizable {
     private
             $height = 0,
             $width = 0,
-            $crop = "stretch";
+            $crop = "stretch",
+            $offset = array('top' => 50, 'left' => 50),
+            $multiplier = array('top' => .5, 'left' => .5);
 
 
 
@@ -17,7 +19,13 @@ class Sizable extends Renderizable {
         $this->height = $height;
         return $this;
     }
-
+    protected function configure(){
+        
+        $this->configureRenderOption('offset', array('top' => 0, 'left' => 0));
+        $this->configureRenderOption('multiplier', array('top' => .5, 'left' => .5));
+        $this->configureRenderOption('dimmension', array('height' => 0, 'width' => 0));
+        parent::configure();
+    }
     public function width($width = false) {
 
         if($width === false) {
@@ -26,7 +34,14 @@ class Sizable extends Renderizable {
         $this->width = $width;
         return $this;
     }
-
+    public function offsetTop($percent = 50){
+        $this->offset['top'] = $percent;
+        return $this;
+    }
+    public function offsetLeft($percent = 50){
+        $this->offset['left'] = $percent;
+        return $this;
+    }
     public function crop() {
 
         $this->crop = "crop";
@@ -51,31 +66,34 @@ class Sizable extends Renderizable {
         $rdr_ratio = $rdr_dimmension['height'] / $rdr_dimmension['width'];
         if($this->crop === "crop" || $this->crop === "fit") {
             
-            $offset = array('top' => 0, 'left' => 0);
+            $pixoffset = array('top' => 0, 'left' => 0);
             $ratio = $dimmension['height'] / $dimmension['width'];
             $rdr_dimmension = $this->getRenderer()->getDimmension();
             $rdr_ratio = $rdr_dimmension['height'] / $rdr_dimmension['width'];
             $has_horiz_offset = $ratio > $rdr_ratio;
+            $multiplier = array('top' => .5, 'left' => .5);
             if($this->crop === "crop"){
                 if($has_horiz_offset){
                     $propor = $this->getRenderer()->getHeight() / $dimmension['height'];
-                    $offset['left'] = ($dimmension['height'] / $rdr_ratio - $dimmension['width']) * $propor;
+                    $multiplier['left'] = $this->offset['left'] / 100;
+                    $pixoffset['left'] = ($dimmension['height'] / $rdr_ratio - $dimmension['width']) * $propor;
                 } else {
-                    echo "ratio: ".$rdr_ratio."<br />";
-                    echo "dimentionh: ".$dimmension['height'];
-                    
                     $propor = $this->getRenderer()->getWidth() / $dimmension['width'];
-                    echo "propor: ".$propor;
-                    $offset['top'] = ($dimmension['width'] * $rdr_ratio - $dimmension['height']) * $propor;
+                    $multiplier['top'] = $this->offset['top'] / 100;
+                    $pixoffset['top'] = ($dimmension['width'] * $rdr_ratio - $dimmension['height']) * $propor;
+
                 }
             } else if($this->crop === "fit"){
 
             }
             
-            $this->getRenderer()->setOffset($offset);
+            $this->setRenderOption('offset', $pixoffset);
+            $this->setRenderOption('multiplier', $multiplier);
         }
-        $this->getRenderer()->setDimmension($dimmension);
-        parent::render();
+        $this->setRenderOption('dimmension', $dimmension);
+        if(false === $this->is_rendered){
+            parent::render();
+        }
 
     }
     public function getDimmension() {
@@ -98,4 +116,17 @@ class Sizable extends Renderizable {
     }
 
 
+    public function setOffset($offset, $multiplier = array('top' => .5, 'left' => .5)) {
+
+        $this->offset = $offset;
+        $this->multiplier = $multiplier;
+    }
+    public function getOffset($border = false) {
+        if(false === $border) return $this->offset;
+        return $this->offset[$border];
+    }
+    public function getMultiplier($border = false){
+        if(false === $border) return $this->multiplier;
+        return $this->multiplier[$border];
+    }
 }
