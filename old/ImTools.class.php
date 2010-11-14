@@ -25,7 +25,6 @@ class ImTools extends ImInstance {
             $this->execute();
         }
         $path = rtrim($this->dest_dir, "/")."/".$filename;
-        echo $path;
     }
 
     public function execute() {

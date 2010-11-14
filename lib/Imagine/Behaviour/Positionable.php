@@ -1,13 +1,16 @@
 <?php
 
-class Positionable extends Sizable {
+abstract class ImagineBehaviourPositionable extends ImagineBehaviourSizable {
+
+    abstract public function getParent();
+    abstract public function setParent($parent);
+
     protected
             $top = 0,
             $left = 0,
             $right = false,
             $bottom = false,
-            $position = "relative",
-            $parent = false;
+            $position = "relative";
 
     private static $borders = array(
             "top" => array(
@@ -41,14 +44,28 @@ class Positionable extends Sizable {
         $this->configureRenderOption('boundaries');
         parent::configure();
     }
-    public function  __call($border,  $arguments) {
+
+    public function top(){
+        return $this->border('top', func_get_args());
+    }
+    public function left(){
+        return $this->border('left', func_get_args());
+    }
+    public function right(){
+        return $this->border('right', func_get_args());
+    }
+    public function bottom(){
+        return $this->border('bottom', func_get_args());
+    }
+
+    public function border($border,  $arguments) {
 
         if(in_array($border, array_keys(self::$borders))) {
 
             if(sizeof($arguments) > 1) {
                 throw new Exception($border." accepts only 1 argument.");
             }
-
+            $this->touch(); 
             $value = false;
             if(sizeof($arguments) === 1) {
                 $value = $arguments[0];
@@ -65,15 +82,7 @@ class Positionable extends Sizable {
             throw new Exception($border.' is not a property');
         }
     }
-    public function getParent() {
-        return $this->parent;
-    }
-    public function setParent($parent) {
-        $this->parent = $parent;
-    }
-    public function hasParent() {
-        return (false !== $this->parent);
-    }
+
     public function getPosition() {
         return array(
                 "left" => $this->left,

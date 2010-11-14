@@ -1,5 +1,5 @@
 <?php
-class Sizable extends Renderizable {
+class ImagineBehaviourSizable extends ImagineBehaviourRenderizable {
 
     private
             $height = 0,
@@ -17,6 +17,7 @@ class Sizable extends Renderizable {
             return $this->height;
         }
         $this->height = $height;
+        $this->touch();
         return $this;
     }
     protected function configure(){
@@ -31,54 +32,63 @@ class Sizable extends Renderizable {
         if($width === false) {
             return $this->width;
         }
+        $this->touch();
         $this->width = $width;
         return $this;
     }
     public function offsetTop($percent = 50){
         $this->offset['top'] = $percent;
+
+        $this->touch();
         return $this;
     }
     public function offsetLeft($percent = 50){
         $this->offset['left'] = $percent;
+
+        $this->touch();
         return $this;
     }
     public function crop() {
 
         $this->crop = "crop";
+        $this->touch();
         return $this;
     }
 
     public function fit() {
 
         $this->crop = "fit";
+
+        $this->touch();
         return $this;
     }
 
     public function stretch() {
 
         $this->crop = "stretch";
+        $this->touch();
         return $this;
     }
     public function render() {
         $dimmension = $this->getDimmension();
         $ratio = $dimmension['height'] / $dimmension['width'];
-        $rdr_dimmension = $this->getRenderer()->getDimmension();
+        $rdr_dimmension = $this->renderer()->getDimmension();
         $rdr_ratio = $rdr_dimmension['height'] / $rdr_dimmension['width'];
         if($this->crop === "crop" || $this->crop === "fit") {
             
             $pixoffset = array('top' => 0, 'left' => 0);
             $ratio = $dimmension['height'] / $dimmension['width'];
-            $rdr_dimmension = $this->getRenderer()->getDimmension();
+            $rdr_dimmension = $this->renderer()->getDimmension();
             $rdr_ratio = $rdr_dimmension['height'] / $rdr_dimmension['width'];
             $has_horiz_offset = $ratio > $rdr_ratio;
             $multiplier = array('top' => .5, 'left' => .5);
             if($this->crop === "crop"){
                 if($has_horiz_offset){
-                    $propor = $this->getRenderer()->getHeight() / $dimmension['height'];
+                    $propor = $this->renderer()->getHeight() / $dimmension['height'];
                     $multiplier['left'] = $this->offset['left'] / 100;
                     $pixoffset['left'] = ($dimmension['height'] / $rdr_ratio - $dimmension['width']) * $propor;
                 } else {
-                    $propor = $this->getRenderer()->getWidth() / $dimmension['width'];
+                    $propor = $this->renderer()->getWidth() / $dimmension['width'];
                     $multiplier['top'] = $this->offset['top'] / 100;
                     $pixoffset['top'] = ($dimmension['width'] * $rdr_ratio - $dimmension['height']) * $propor;
 
@@ -97,7 +107,7 @@ class Sizable extends Renderizable {
 
     }
     public function getDimmension() {
-        $rdim = $this->getRenderer()->getDimmension();
+        $rdim = $this->renderer()->getDimmension();
         if(!$this->width && !$this->height) {
             return $rdim;
         }

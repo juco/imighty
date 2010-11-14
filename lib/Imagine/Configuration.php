@@ -10,9 +10,9 @@ class ImagineConfiguration {
 
     protected static
             $settings = array(
-                "output_dir" => "",
-                "input_dir" => "",
-                "renderer" => "gdRenderer"
+                "output" => "",
+                "input" => "",
+                "renderer" => "Gd"
             ),
             $protected_options = array();
     protected $options = array();
@@ -47,22 +47,17 @@ class ImagineConfiguration {
     }
 
     public function __call($name,  $arguments) {
-
         $property = $this->decamelize($name);
 
         if(key_exists($property, $this->options)) {
-
             if(sizeof($arguments) == 0) {
-
                 return $this->$property;
 
             } else if (sizeof($arguments) == 1) {
-
                 $this->$property = $arguments[0];
                 return $this;
 
             } else {
-
                 throw new Exception("Only one argument for this setter: ".$name);
             }
         } else {

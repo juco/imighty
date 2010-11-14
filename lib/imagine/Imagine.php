@@ -1,22 +1,24 @@
 <?php
 
-require_once("ImagineCore.php");
-require_once("ImagineConfiguration.php");
+require_once("Core.php");
 
 class Imagine extends ImagineCore {
     
-    public function configureTools($tools = array()) {
-        
-        $tools = array(
-                "layer" => "ImagineLayer",
-                "image" => "ImagineImage",
-                "text" => "ImagineText"
+    public function configureTools() {
+        return array(
+                "layer" => "ImagineToolLayer",
+                "image" => "ImagineToolImage",
+                "text" => "ImagineToolText"
         );
-        return $tools;
+    }
+
+    public function configureFilters(){
+        return array(
+          'grayscale' => 'ImagineFilterGrayscale'
+        );
     }
     
-    public function configureAutoload($dirs = array()){
-
-        return $dirs;
+    public function configureAutoload(){
+        return array();
     }
 }
