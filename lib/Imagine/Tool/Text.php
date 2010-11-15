@@ -3,13 +3,14 @@
 class ImagineToolText extends ImagineBehaviourContainer {
 
     protected
-    $styles = array(),
-    $text = '';
+            $styles = array(),
+            $text = '';
 
     public function style() {
         $this->touch();
         $args = func_get_args();
         if (sizeof($args) == 2 && is_array($args[1])) {
+
             $this->styles[$args[0]] = new ImagineToolStyle($args[1]);
         } else if (sizeof($args)) {
             $this->styles = array_merge($this->styles, $args);
@@ -17,6 +18,16 @@ class ImagineToolText extends ImagineBehaviourContainer {
             return new ImagineToolStyle();
         }
         return $this;
+    }
+
+    public function mixStyles($style, $styles) {
+
+        foreach($styles as $style_name) {
+            if(isset($this->styles[$style_name])) {
+                echo $style_name.": ".get_class($style)." ";
+                $style->mix($this->styles[$style_name]);
+            }
+        }
     }
 
     public function write($text) {
@@ -27,18 +38,32 @@ class ImagineToolText extends ImagineBehaviourContainer {
 
     public function render() {
         if ($this->is_rendered === false) {
-
-            $this->renderer()->text()->write($this->processText());
+            $text = $this->processText($this->getHtmlDom(), $this->style());
+            $this->renderer()->text()->write($text);
         }
         parent::render();
     }
 
-    public function processText() {
+    public function processText($blocks = false, $current_style = false) {
 
-        $blocks = $this->getHtmlDom($this->text);
-        foreach ($blocks as $i => $block) {
-            
+        $out = array();
+        foreach($blocks as $name => $block) {
+            if(!is_int($name)) {
+                preg_match_all('/[\.#]?[a-zA-Z0-9]{1,}/', $name, $matches);
+                echo get_class($current_style);
+                $current_style = $this->mixStyles($current_style, $matches[0]);
+            }
+            $out[$name] = array();
+
+            if(is_array($block)) {
+                $out[$name]['value'] = $this->processText($block, $current_style);
+
+            } else {
+                $out[$name]['value'] = $block;
+                $out[$name]['style'] = $current_style;
+            }
         }
+        return $out;
     }
 
     public function getHtmlDom() {
@@ -47,23 +72,10 @@ class ImagineToolText extends ImagineBehaviourContainer {
             $text = '<root>' . $text . '</root>';
         }
 
-        $html = phpQuery::newDocument($this->text);
-        $blocksdom = $html->children();
-        $blocks = array();
-
-        for ($i = 0; $i < $blocksdom->count(); $i++) {
-            $block = $blocksdom->eq($i);
-            $blocknode = $blocksdom->get($i);
-
-            $blocks[] = array(
-                'style_chain' => 'all ' . $blocknode->nodeName,
-                'content' => $block->text()
-            );
-        }
-        return $blocks;
+        return $this->getHtmlStructure($text);
     }
 
-    protected function toArray($data) {
+    protected function getHtmlStructure($data) {
         /* mvo voncken@mailandnews.com
           original ripped from  on the php-manual:gdemartini@bol.com.br
           to be used for data retrieval(result-structure is Data oriented) */
@@ -76,12 +88,12 @@ class ImagineToolText extends ImagineBehaviourContainer {
 
         $tree = array();
         $i = 0;
-        $tree = get_children($vals, $i);
+        $tree = $this->getNodeChildren($vals, $i);
 
         return $tree;
     }
 
-    protected function getChildren($vals, &$i) {
+    protected function getNodeChildren($vals, &$i) {
         /**
          * From http://phptoy.googlecode.com/svn
          */
@@ -101,7 +113,7 @@ class ImagineToolText extends ImagineBehaviourContainer {
                     array_push($children, $vals[$i]['value']);
                     break;
                 case 'complete':
-                    $name = get_name($vals[$i]);
+                    $name = $this->getNodeName($vals[$i]);
 
                     /* if the value is an empty string, php doesn't include the 'value' key
                       in its array, so we need to check for this first */
@@ -113,7 +125,7 @@ class ImagineToolText extends ImagineBehaviourContainer {
 
                     break;
                 case 'open':
-                    $name = get_name($vals[$i]);
+                    $name = $this->getNodeName($vals[$i]);
                     $j++;
 
                     if ($prevtag <> $name) {
@@ -121,7 +133,7 @@ class ImagineToolText extends ImagineBehaviourContainer {
                         $prevtag = $name;
                     }
 
-                    $children{($name)} = get_children($vals, $i);
+                    $children{($name)} = $this->getNodeChildren($vals, $i);
                     break;
                 case 'close':
                     return $children;
@@ -129,17 +141,24 @@ class ImagineToolText extends ImagineBehaviourContainer {
         }
     }
 
-    function getNodeName($tag) {
+    protected function getNodeName($tag) {
         $name = $tag['tag'];
         if (isset($tag['attributes'])) {
             if (isset($tag['attributes']['class'])) {
                 $name .= '.' . implode(".", explode(" ", $tag['attributes']['class']));
             }
             if (isset($tag['attributes']['id'])) {
-                $name .= '#' . implode("#", explode(" ", $tag['attributes']['class']));
+                $name .= '#' . implode("#", explode(" ", $tag['attributes']['id']));
             }
         }
         return $name;
+    }
+    
+    public  function save($filename) {
+        
+        if(false === $this->is_rendered) {
+            $this->render();
+        }
     }
 
 }
