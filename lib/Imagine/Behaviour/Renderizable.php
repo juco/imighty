@@ -24,6 +24,7 @@ abstract class ImagineBehaviourRenderizable {
         $reflection_class = new ReflectionClass($renderer_class);
         $this->renderer = $reflection_class->newInstance($imagine);
         $this->renderer->setConfiguration($this->configuration);
+        $this->renderer->setLayer($this);
         $this->configure();
     }
     protected function configure() {
@@ -64,6 +65,7 @@ abstract class ImagineBehaviourRenderizable {
             $this->render();
         }
         $this->renderer()->saveFile($filename);
+        return $this;
     }
     public function addToRenderStack($renderer) {
         array_push($this->render_stack, $renderer);

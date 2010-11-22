@@ -9,6 +9,7 @@ class ImagineCore {
             $registered_autoload_dirs = array(),
             $registered_tools = array(),
             $registered_filters = array(),
+            $registered_fonts = array(),
             $instance = false,
             $registered = false,
             $included_vendors = array();
@@ -88,11 +89,8 @@ class ImagineCore {
     public static function getInstance($configuration = false) {
 
         if(false === self::$instance) {
-
             $class = get_called_class();
-
             $imagine = new $class($configuration);
-
             self::$instance = $imagine;
         }
 
@@ -123,6 +121,7 @@ class ImagineCore {
 
         self::registerAutoloadClasses($class, "Tools");
         self::registerAutoloadClasses($class, "Filters");
+        self::registerFonts($class);
 
         self::$registered = true;
     }
@@ -180,6 +179,28 @@ class ImagineCore {
         }
     }
 
+    public static function registerFonts($class){
+        $dirname = realpath(__DIR__.'/../asset/fonts');
+        if(method_exists($class, 'configureFonts')){
+            $fonts = call_user_func($class.'::configureFonts');
+            if(is_array($fonts)) {
+                foreach($fonts as $name => $font){
+                    if(!preg_match('/\.ttf$/', $font)){
+                        $font .= '.ttf';
+                    }
+                    self::$registered_fonts[$name] = $dirname.'/'.$font;
+                }
+            }
+        }
+    }
+
+    public static function getFont($font){
+        if(!isset(self::$registered_fonts[$font])){
+            throw new Exception('Unknown font: '.$font);
+        }
+        return self::$registered_fonts[$font];
+    }
+
     public static function autoload($class) {
 
         if(!isset(self::$classes[$class])) {
@@ -206,11 +227,5 @@ class ImagineCore {
             $files = array_merge($files, self::rglob($pattern, $path, $flags));
         }
         return $files;
-    }
-
-    public static function dump($data) {
-        if(is_array($data) || is_object($data)) {
-            var_dump($data);
-        }
     }
 }

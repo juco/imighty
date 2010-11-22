@@ -4,12 +4,7 @@ class ImagineRendererGd extends ImagineRendererRenderer {
 
     protected static $text = false;
 
-    public function  __construct($imagine) {
-        if(false === self::$_core_initialized) {
-            self::initCore();
-        }
-        $this->imagine = $imagine;
-    }
+    
 
     public function loadFile($filename = "") {
         $types = self::$_types;
@@ -161,7 +156,6 @@ class ImagineRendererGd extends ImagineRendererRenderer {
     */
 
     protected static
-            $_core_initialized = false,
             $_core_settings = array();
 
     protected static $_types = array (

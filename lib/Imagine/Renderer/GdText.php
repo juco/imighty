@@ -7,123 +7,188 @@
  */
 class ImagineRendererGdText {
 
-    protected 
+    protected
             $renderer = false;
-    
-    public function __construct(ImagineRendererGd $renderer){
-        $this->renderer = $renderer;
-    }
-    
-    public function write($blocks) {
-//        $output = array();
-//        $gdfont["text"] = str_replace("\r\n", "\n",$gdfont["text"]);
-//        $gdfont["text"] = str_replace("\r", "",$gdfont["text"]);
-//        $blocks = explode("\n", $gdfont["text"]);
-//        foreach($blocks as $block) {
-//            $block_output = array();
-//            ## Determine baseline and base image height
-//            $box = imagettfbbox($gdfont['size'],0,$gdfont['font_dir'].$gdfont['font'],$block);
-//            $width = abs($box[0]) + abs($box[2]);
-//
-//            $box = @imagettfbbox($gdfont['size'],0,$gdfont['font_dir'].$gdfont['font'],$gdfont['test_chars']);
-//            $dip = abs($box[3]);
-//            $box = imagettfbbox($gdfont['size'],0,$gdfont['font_dir'].$gdfont['font'],$block);
-//            $lowheight = abs($box[5]-$dip);
-//            $height = abs($box[5]);
-//            //$gdfont["text"] = str_replace("", "", $gdfont["text"]);
-//            ## Check for multiple lines, place each newline into array
-//            if (!$gdfont['leading'])
-//                $gdfont['leading'] = round($lowheight*.2);
-//            if ($gdfont['max_width']) {
-//
-//                while ($width > ($gdfont['max_width']-($gdfont['padding']*2))) {
-//
-//                    $lines++;
-//                    $i = $width;
-//                    $t = strlen($block);
-//
-//                    while (($i > ($gdfont['max_width']-($gdfont['padding']*2))) ) {
-//                        //&& $gdfont["text"][$t]!="\r"
-//
-//                        $t--;
-//                        $box = imagettfbbox($gdfont['size'],0,$gdfont['font_dir'].$gdfont['font'],substr($block,0,$t));
-//                        $i = abs($box[0]) + abs($box[2]);
-//                    }
-//
-//                    $t = strrpos(substr($block, 0, $t),' ');
-//                    $block_output[$lines-1] = substr($block,0,$t);
-//
-//                    $block = ltrim(substr($block, $t));
-//                    $block_output[] = $block;
-//
-//                    $box = imagettfbbox($gdfont['size'],0,$gdfont['font_dir'].$gdfont['font'],$block_output[$lines]);
-//                    $width = abs($box[0]) + abs($box[2]);
-//                }
-//            } else {
-//                $gdfont['max_width'] = $width;
-//                $hpad = ($gdfont['padding']*2);
-//            }
-//
-//            $lines++;
-//
-//            if (!count($block_output))
-//                $output[] = $block;
-//            else
-//                $output += $block_output;
-//        }
-//        ## Create total image size
-//        $amp_width = $gdfont['max_width']+$gdfont['hadj']+$hpad;
-//        $amp_height = ($lowheight*$lines) + ($gdfont['leading']*($lines-1)) + $gdfont['vadj'] + ($gdfont['padding']*2);
-//        $im = imagecreate ($amp_width, $amp_height);
-//        $im2 = imagecreatetruecolor(floor($amp_width / $gdfont["multiplyer"]), floor($amp_height / $gdfont["multiplyer"]));
-//        ## Color and Background Color
-//        $color = hex_to_rgb($gdfont['color']);
-//        $background = hex_to_rgb($gdfont['background']);
-//        $color1 = imagecolorallocate($im,$background['r'],$background['g'],$background['b']);
-//        $color12 = imagecolorallocate($im2,$background['r'],$background['g'],$background['b']); ## Sets background color
-//        $color2 = imagecolorallocate($im,$color['r'],$color['g'],$color['b']);
-//        $color22 = imagecolorallocate($im,$color['r'],$color['g'],$color['b']);
-//
-//        ## Transparency and Alias
-//        if ($gdfont['transparent']) {
-//            imagecolortransparent($im,$color1);
-//            imagecolortransparent($im2,$color1);
-//        }
-//        if ($gdfont['alias'])
-//            $color2 = -$color2;
-//
-//        ## Output all the line of text as placed in array, configure alignment and padding
-//        $i = 2;
-//        $vpad = $gdfont['padding'];
-//        foreach ($output as $value) {
-//            $box = imagettfbbox($gdfont['size'],0,$gdfont['font_dir'].$gdfont['font'],$value);
-//            $w = abs($box[0]) + abs($box[2]);
-//            if ($gdfont['alignment'] == 'right')
-//                $x =  ($gdfont['max_width']-($gdfont['padding']*2))-$w;
-//            if ($gdfont['alignment'] == 'center')
-//                $x = (($gdfont['max_width']-($gdfont['padding']*2))-$w) / 2;
-//
-//            imagettftext($im,$gdfont['size'],0,$x+$gdfont['padding'],($height*($i-1))+($gdfont['leading']*($i-2))+$vpad,$color2,$gdfont['font_dir'].$gdfont['font'],$value);
-//            $i++;
-//        }
-//        imageantialias($im2, true);
-//        imagecopyresampled($im2, $im, 0, 0, 0, 0, floor($amp_width / $gdfont["multiplyer"]), floor($amp_height / $gdfont["multiplyer"]), $amp_width, $amp_height);
-//
-//        if($gdfont['image_type'] == 'png') {
-//            if($cache)
-//                imagepng($im2,$gdfont['cache_path'].$filename.'.png');
-//            else
-//                imagepng($im2);
-//        }
-//        if($gdfont['image_type'] == 'gif') {
-//            if($cache)
-//                imagegif($im2,$gdfont['cache_path'].$filename.'.gif');
-//            else
-//                imagegif($im2);
-//        }
-//        imagedestroy($im);
-//        imagedestroy($im2);
 
+    protected
+            $test_chars = 'abcdefghijklmnopqrstuvwxyzáéíóúñçABCDEFGHIJKLMNOPQRSTUVWXYZÁÉÍÓÚÑÇ1234567890!@#$%^&*()\'"\\/;.,`~<>[]{}-+_-=';
+
+    public function __construct(ImagineRendererGd $renderer) {
+        $this->renderer = $renderer;
+        $this->exp = 8;
+    }
+
+    public function write($blocks) {
+        
+        $layer_width = $this->getRenderer()->getLayer()->width();
+        $blocks = $this->processBlocks($blocks, $layer_width); //by reference
+
+       $last_chunk = $blocks[sizeof($blocks)-1];
+
+        $y = $last_chunk['position']['y'];
+        $real_height =  $y + $last_chunk['style']->line_height();
+
+        $im = imagecreate ($layer_width*$this->exp, $real_height*$this->exp);
+
+
+
+        foreach ($blocks as $block) {
+            $style = $block['style'];
+
+            $color = $this->hex_to_rgb($style->color());
+            $background = $this->hex_to_rgb($style->background());
+            $background_alloc = imagecolorallocate($im,$background['r'],$background['g'],$background['b']);
+            $x = $block['position']['x']*$this->exp;
+            $y = $block['position']['y']*$this->exp;
+            imagefilledrectangle($im, $x, $y, $x + $block['width']  * $this->exp, $y + $style->line_height() * $this->exp, $background_alloc);
+            $color_alloc = imagecolorallocate($im,$color['r'],$color['g'],$color['b']);
+            imagettftext(
+                    $im,
+                    $block['style']->size()*72/96*$this->exp,
+                    0,
+                    $block['position']['x'] * $this->exp,
+                    $this->yToLine($block['position']['y']*$this->exp, $block['style']->line_height()*$this->exp, $block['style']->size()*$this->exp),
+                    $color_alloc,
+                    $block['style']->font(true),
+                    $block['text']
+            );
+
+        }
+        $im2 = imagecreatetruecolor($layer_width, $real_height);
+        imagecopyresampled($im2, $im, 0, 0, 0, 0, $layer_width, $real_height, $layer_width*$this->exp, $real_height*$this->exp);
+        $this->renderer->sendData(array(
+                'width' => $layer_width,
+                'height' => $real_height,
+                'resource' => $im2
+        ));
+
+    }
+    protected function processBlocks($blocks, &$layer_width, &$x = 0, &$y = 0) {
+        // baseline = .347 * line_height + line_center
+        $output = array();
+        $real_width = 0;
+        $real_height = 0;
+        foreach($blocks as $which => $block) {
+
+                $style = $block['style'];
+            if(!is_array($block['value'])) {
+
+                $value = $block['value'];
+                if($style->maxwidth()) {
+                    $max_width = $style->maxwidth();
+                } else {
+                    $max_width = $layer_width;
+                }
+
+                if(!$max_width) {
+                    $metrix = $this->getMetrics($block['value'], $style);
+                    $output[] = array(
+                            'text' => $block['value'],
+                            'position' => array('x' => $x, 'y' => $y),
+                            'style' => $style,
+                            'size' => $metrix
+                    );
+                    if($real_height < $y + $metrix['height']) {
+                        $real_height = $y + $metrix['height'];
+                    }
+                    if($real_width < $x + $metrix['width']) {
+                        $real_width = $x + $metrix['width'];
+                    }
+
+                    if($style->display() != "block") {
+                        $x += $metrix['width'];
+                    }
+                } else {
+                    $output = array_merge($output, $this->lineSplit($block['value'], $max_width, $style, $x, $y));
+                }
+
+            } else {
+
+                $output = array_merge($output, $this->processBlocks($block['value'], $layer_width, $x, $y));
+
+            }
+            if($style->display() == "block" && !is_int($which)) {
+                $y += $style->line_height();
+                $x = 0;
+
+            }
+        }
+        if($real_width > $layer_width) {
+            $layer_width = $real_width;
+        }
+        return $output;
+    }
+    protected function yToLine($y, $line_height, $size) {
+        return round($y + $line_height / 2 + $size / 3);
+    }
+
+    protected function lineSplit($line, $max_width, $style, &$x, &$y) {
+        $line = str_replace('\n', ' ', $line);
+        $line = preg_replace('/\s{2,}/',' ', $line);
+
+        $space_metrics = $this->getMetrics(' ', $style);
+        $chunks = explode(' ', $line);
+        $output = array(array(
+                        'text' => '',
+                        'position' => array('x' => $x, 'y' => $y),
+                        'style' => $style
+        ));
+        $actual_count = 0;
+        foreach($chunks as $i => $chunk) {
+                if($i != 0){
+                    $line_part = $output[$actual_count]['text'].' '.$chunk;
+                } else {
+                    $line_part = $chunk;
+                }
+                $line_metrics = $this->getMetrics($line_part, $style);
+                $line_width = $line_metrics['width'];
+                if($line_width + $x > $max_width) {
+                    $chunk_metrics = $this->getMetrics($chunk, $style);
+                    $y += $style->line_height();
+                    $x = 0;
+                    
+                    $output[++$actual_count] = array(
+                            'text' => $chunk,
+                            'position' => array('x' => $x, 'y' => $y),
+                            'style' => $style,
+                            'width' => $chunk_metrics['width']
+                    );
+                } else {
+                    
+                    $output[$actual_count]['text'] = $line_part;
+                    $output[$actual_count]['width'] = $line_width;
+                }
+        }
+        $x = $line_width + $x;
+        return $output;
+    }
+    public function getMetrics($text, $style) {
+        $box = imagettfbbox($style->size()*72/96*$this->exp, 0, $style->font(true), $text);
+        $width = $box[0]/$this->exp + $box[2]/$this->exp;
+
+        $height = $box[7]/$this->exp - $box[1]/$this->exp;
+        return array('width' => $width, 'height' => $height);
+    }
+
+  
+    public function hex_to_rgb($hex) {
+        ## Convert HEX to RGB 255,255,255
+        ## remove '#'
+        $hex = str_replace('#','',$hex);
+        # expand short form ('fff') color
+        if(strlen($hex) == 3)
+            $hex .= $hex;
+        if(strlen($hex) != 6)
+            $hex == '000000';
+        ## convert
+        $rgb['r'] = hexdec(substr($hex,0,2)) ;
+        $rgb['g'] = hexdec(substr($hex,2,2)) ;
+        $rgb['b'] = hexdec(substr($hex,4,2)) ;
+        return $rgb ;
+    }
+
+    public function getRenderer() {
+        return $this->renderer;
     }
 }
 ?>

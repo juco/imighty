@@ -3,13 +3,28 @@ abstract class ImagineRendererRenderer {
     public abstract function loadFile($filename);
     public abstract function saveFile($filename);
     public abstract function resize();
-    
+    public abstract static function initCore();
+
     protected
             $configuration,
             $render_options,
             $original_data = false,
             $rendered_data = false,
-            $is_rendered = false;
+            $is_rendered = false,
+            $layer = false,
+            $imagine = false;
+    
+    protected static 
+            $_core_initialized = false;
+
+    public function  __construct($imagine) {
+        if(false === self::$_core_initialized) {
+            $class = get_called_class();
+            call_user_func($class.'::initCore');
+        }
+        $this->imagine = $imagine;
+    }
+
     public function setConfiguration($configuration){
         $this->configuration = $configuration;
     }
@@ -64,6 +79,13 @@ abstract class ImagineRendererRenderer {
     }
     public function render(){
         $this->resize();
+    }
+    public function getLayer(){
+        return $this->layer;
+    }
+    public function setLayer($layer){
+        $this->layer = $layer;
+        
     }
 }
 

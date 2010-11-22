@@ -17,6 +17,15 @@ class Imagine extends ImagineCore {
           'grayscale' => 'ImagineFilterGrayscale'
         );
     }
+    public function configureFonts(){
+        return array(
+            'arial' => 'arial',
+            'arial_bold' => 'arialbd',
+            'arial_black' => 'arialblk',
+            'arial_italic' => 'ariali',
+            'arial_bold_italic' => 'arialbi'
+        );
+    }
     
     public function configureAutoload(){
         return array();
