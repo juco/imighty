@@ -4,7 +4,7 @@ class ImagineRendererGd extends ImagineRendererRenderer {
 
     protected static $text = false;
 
-    
+
 
     public function loadFile($filename = "") {
         $types = self::$_types;
@@ -18,6 +18,7 @@ class ImagineRendererGd extends ImagineRendererRenderer {
         if(false !== $configuration->input) {
             $new_filename = rtrim($configuration->input, "/")."/".ltrim($filename, "/");
         }
+
         if(file_exists($new_filename)) {
             $filename = $new_filename;
         } else {
@@ -36,10 +37,12 @@ class ImagineRendererGd extends ImagineRendererRenderer {
                 'type' => $info[2],
                 'resource' => null
         );
+
         if ($types[$imagedata['type']]['supported'] < 1) {
             throw new Exception('Imagetype ('.$types[$imagedata['type']]['ext'].') not supported for reading.');
             return null;
         }
+
         switch ($imagedata['type']) {
             case 1:
                 $dummy = imagecreatefromgif($filename);
@@ -71,14 +74,15 @@ class ImagineRendererGd extends ImagineRendererRenderer {
         }
 
         $this->original_data = $imagedata;
-
     }
 
     public function saveFile($filename) {
         $configuration = $this->getConfiguration();
+
         if(false !== $configuration->output) {
             $new_filename = rtrim($configuration->output, "/")."/".ltrim($filename, "/");
         }
+
         if(is_dir(dirname($new_filename))) {
             $filename = $new_filename;
         } else {
@@ -87,28 +91,20 @@ class ImagineRendererGd extends ImagineRendererRenderer {
             }
         }
 
-        $resource = $this->getResource();
-        //header("Content-Type: image/png;");
-        //imagealphablending($resource, false);
-        //imagesavealpha($resource, true);
-
-        imagepng($resource, $new_filename);
-
+        imagepng($this->getResource(), $new_filename);
     }
-
-
-
-
 
     public function resize() {
         $data = $this->pickData();
+
         $offset = $this->getRenderOption('offset');
         $multiplier = $this->getRenderOption('multiplier');
         $dimmension = $this->getRenderOption('dimmension');
+
         $width = $dimmension['width']? $dimmension['width']:$data['width'];
         $height = $dimmension['height']? $dimmension['height']:$data['height'];
-        $new_image = imagecreatetruecolor($width, $height);
 
+        $new_image = imagecreatetruecolor($width, $height);
         imagecopyresampled(
                 $new_image,
                 $data['resource'],
@@ -124,17 +120,19 @@ class ImagineRendererGd extends ImagineRendererRenderer {
         $this->rendered_data['width'] = $width;
         $this->rendered_data['height'] = $height;
         $this->rendered_data['resource'] = $new_image;
-        
+
         $this->is_rendered = true;
     }
 
     public function mix($child) {
         $data = $this->pickData();
-        $renderer = $child->renderer();
+        $renderer = $child->getRenderer();
+        $child_resource = $renderer->getResource();
         $position = $renderer->getRenderOption('boundaries');
+
         imagecopy(
                 $data['resource'],
-                $renderer->getResource(),
+                $child_resource,
                 $position['left'],
                 $position['top'],
                 0,
@@ -142,11 +140,13 @@ class ImagineRendererGd extends ImagineRendererRenderer {
                 $renderer->getWidth(),
                 $renderer->getHeight()
         );
+
+        $this->sendData($data);
         $this->is_rendered = true;
     }
 
-    public function text(){
-        if(false === self::$text){
+    public function text() {
+        if(false === self::$text) {
             self::$text = new ImagineRendererGdText($this);
         }
         return self::$text;
@@ -211,5 +211,19 @@ class ImagineRendererGd extends ImagineRendererRenderer {
         self::$_core_settings = $settings;
         self::$_core_initialized = true;
     }
-    
+    public static function hex_to_rgb($c) {
+        $c = trim($c, ' #');
+        if(strlen($c) == 3) {
+            $c = $c[0].$c[0].$c[1].$c[1].$c[2].$c[2];
+        }
+        preg_match("/(.{2})(.{2})(.{2})/", $c, $matches);
+        list($whole, $r, $g, $b) = $matches;
+
+        $rgb = array();
+        $rgb['r'] = hexdec($r);
+        $rgb['g'] = hexdec($g);
+        $rgb['b'] = hexdec($b);
+
+        return $rgb ;
+    }
 }

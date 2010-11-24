@@ -1,13 +1,36 @@
 <?php
 
-class ImagineToolText extends ImagineBehaviourContainer {
+class ImagineLayerText extends ImagineLayerLayer {
 
     protected
             $styles = array(),
-            $text = '';
+            $text = '',
+            $padding = array(
+                'top' => 0,
+                'left' => 0,
+                'right' => 0,
+                'bottom' => 0
+            );
+
+    public function padding(){
+        $args = func_get_args();
+
+        if(sizeof($args) == 1 && is_string($args[0])){
+            return $this->padding[$args[0]];
+        } else if(sizeof($args)==2 && is_int($args[1]) && is_string($args[0])){
+            $this->padding[$args[0]] = $args[1];
+        } else if(sizeof($args)==1 && is_int($args[0])){
+            foreach(array_keys($this->padding) as $border){
+                $this->padding[$border] = $args[0];
+            }
+        } else {
+            throw new Exception('No valid data.');
+        }
+        
+        return $this;
+    }
 
     public function style() {
-        $this->touch();
         $args = func_get_args();
         if(isset($this->styles['default'])) {
             $default_opts = $this->styles['default']->getTouchedArray();
@@ -16,7 +39,10 @@ class ImagineToolText extends ImagineBehaviourContainer {
         }
 
         if (sizeof($args) == 2 && is_array($args[1])) {
+
+            $this->touch();
             if(isset($this->styles[$args[0]])) {
+
                 $this->styles[$args[0]]->processArray($args[1]);
             } else {
                 $pre = new ImagineToolStyle($default_opts);
@@ -24,6 +50,8 @@ class ImagineToolText extends ImagineBehaviourContainer {
                 $this->styles[$args[0]] = $pre;
             }
         } else if (sizeof($args)) {
+
+            $this->touch();
             $this->styles = array_merge($this->styles, $args);
         } else {
             return new ImagineToolStyle($default_opts);
@@ -50,8 +78,7 @@ class ImagineToolText extends ImagineBehaviourContainer {
     public function render() {
         if ($this->is_rendered === false) {
             $text = $this->processText($this->getHtmlDom(), $this->style());
-            //var_dump($text);
-            $this->renderer()->text()->write($text);
+            $this->getRenderer()->text()->write($text);
         }
         parent::render();
     }
@@ -69,7 +96,7 @@ class ImagineToolText extends ImagineBehaviourContainer {
             $out[$name] = array();
 
             if(is_array($block)) {
-                
+
                 $out[$name]['value'] = $this->processText($block, $style);
             } else {
                 $out[$name]['value'] = $block;
@@ -133,7 +160,7 @@ class ImagineToolText extends ImagineBehaviourContainer {
 
                     /* if the value is an empty string, php doesn't include the 'value' key
                       in its array, so we need to check for this first */
-                     $arr = array();
+                    $arr = array();
                     if (isset($vals[$i]['value'])) {
                         $arr[$name] = $vals[$i]['value'];
                     } else {
@@ -170,5 +197,4 @@ class ImagineToolText extends ImagineBehaviourContainer {
         }
         return $name;
     }
-
 }

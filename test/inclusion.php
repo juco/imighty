@@ -10,9 +10,9 @@ Imagine::configuration(array(
 
 
 $filter = Imagine::filter('grayscale')->
-        setWhite('#ff0000')->
-        setBlack('#000')->
-        setColor('#ff0000');
+        white('#ff0000')->
+        black('#000')->
+        color('#ff0000');
 
 $include = Imagine::image()->
         load("horizontal.jpg")->
@@ -43,9 +43,9 @@ flush();
 
 $include->
         width(100)->
-        loadFile('vertical.jpg');
+        load('vertical.jpg');
 $include2 = Imagine::image()->
-        loadFile("horizontal.jpg")->
+        load("horizontal.jpg")->
         height(70)->
         width(50)->
         crop()->
@@ -62,9 +62,9 @@ $include2->down($include);
 
 $include->down($include2);
 
-$filter->setColor(false);
+$filter->color(false);
 
-$image->saveFile("vertical2.jpg");
+$image->save("vertical2.jpg");
 
 
 ?>

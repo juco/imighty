@@ -21,13 +21,13 @@ Imagine::configuration(array(
 ));
 $text = Imagine::text()->
         write($html)->
-        style('default', array('size' => 16, 'line_height' => 80, 'background' => '#9ff'))->
-        style('h1', array('display' => 'block', 'size' => 32, 'line_height' => 100, 'font_weight' => 'bold'))->
+        style('default', array('size' => 16, 'line_height' => 20, 'background' => '#9ff'))->
+        style('h1', array('display' => 'block', 'size' => 32, 'line_height' => 40, 'font_weight' => 'bold'))->
         style('p', array('display' => 'block'))->
         style('em', array())->
         style('a', array('font_weight' => 'bold'))->
         style('code', array())->
-        style('strong', array('font_weight' => 'bold'))->
+        style('strong', array('font_weight' => 'bold', 'background' => '#f00'))->
         width(500)->
         save('text.jpg');
 ?>
@@ -41,11 +41,9 @@ $text = Imagine::text()->
     }
     h1 {
         margin: 0px;
-        line-height: 100px;
     }
     p {
         margin:0px;
-        line-height: 80px;
     }
 </style>
 

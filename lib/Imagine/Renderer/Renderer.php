@@ -77,8 +77,17 @@ abstract class ImagineRendererRenderer {
        $this->rendered_data = $data;
        $this->is_rendered = true;
     }
+    
     public function render(){
-        $this->resize();
+        $dimmension = $this->getRenderOption('dimmension');
+
+        $diff_height = $dimmension['height'] != $this->pickData('height');
+        $diff_width = $dimmension['width'] != $this->pickData('width');
+        
+        $will_resize = $diff_width || $diff_height;
+        if($will_resize){
+            $this->resize();
+        }
     }
     public function getLayer(){
         return $this->layer;

@@ -30,6 +30,7 @@ class ImagineBehaviourSizable extends ImagineBehaviourRenderizable {
     public function width($width = false) {
 
         if($width === false) {
+ 
             return $this->width;
         }
         $this->touch();
@@ -72,23 +73,23 @@ class ImagineBehaviourSizable extends ImagineBehaviourRenderizable {
     public function render() {
         $dimmension = $this->getDimmension();
         $ratio = $dimmension['height'] / $dimmension['width'];
-        $rdr_dimmension = $this->renderer()->getDimmension();
+        $rdr_dimmension = $this->getRenderer()->getDimmension();
         $rdr_ratio = $rdr_dimmension['height'] / $rdr_dimmension['width'];
         if($this->crop === "crop" || $this->crop === "fit") {
             
             $pixoffset = array('top' => 0, 'left' => 0);
             $ratio = $dimmension['height'] / $dimmension['width'];
-            $rdr_dimmension = $this->renderer()->getDimmension();
+            $rdr_dimmension = $this->getRenderer()->getDimmension();
             $rdr_ratio = $rdr_dimmension['height'] / $rdr_dimmension['width'];
             $has_horiz_offset = $ratio > $rdr_ratio;
             $multiplier = array('top' => .5, 'left' => .5);
             if($this->crop === "crop"){
                 if($has_horiz_offset){
-                    $propor = $this->renderer()->getHeight() / $dimmension['height'];
+                    $propor = $this->getRenderer()->getHeight() / $dimmension['height'];
                     $multiplier['left'] = $this->offset['left'] / 100;
                     $pixoffset['left'] = ($dimmension['height'] / $rdr_ratio - $dimmension['width']) * $propor;
                 } else {
-                    $propor = $this->renderer()->getWidth() / $dimmension['width'];
+                    $propor = $this->getRenderer()->getWidth() / $dimmension['width'];
                     $multiplier['top'] = $this->offset['top'] / 100;
                     $pixoffset['top'] = ($dimmension['width'] * $rdr_ratio - $dimmension['height']) * $propor;
 
@@ -107,7 +108,7 @@ class ImagineBehaviourSizable extends ImagineBehaviourRenderizable {
 
     }
     public function getDimmension() {
-        $rdim = $this->renderer()->getDimmension();
+        $rdim = $this->getRenderer()->getDimmension();
         if(!$this->width && !$this->height) {
             return $rdim;
         }

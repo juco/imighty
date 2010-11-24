@@ -6,9 +6,9 @@ class Imagine extends ImagineCore {
     
     public function configureTools() {
         return array(
-                "layer" => "ImagineToolLayer",
-                "image" => "ImagineToolImage",
-                "text" => "ImagineToolText"
+                "layer" => "ImagineLayerLayer",
+                "image" => "ImagineLayerImage",
+                "text" => "ImagineLayerText"
         );
     }
 

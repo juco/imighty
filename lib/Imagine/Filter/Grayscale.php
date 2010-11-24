@@ -29,17 +29,17 @@ class ImagineFilterGrayscale  extends ImagineFilterFilter {
         }
         return $this->color;
     }
-    public function setWhite($white) {
+    public function white($white) {
         $this->touch();
         $this->white = $white;
         return $this;
     }
-    public function setBlack($black) {
+    public function black($black) {
         $this->touch();
         $this->black;
         return $this;
     }
-    public function setColor($color) {
+    public function color($color) {
 
         $this->touch();
         $this->color = $color;

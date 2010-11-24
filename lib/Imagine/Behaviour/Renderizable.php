@@ -33,11 +33,14 @@ abstract class ImagineBehaviourRenderizable {
     public function render() {
         // TODO: filters here add to renderStack Wha
         $this->render_stack = array_reverse($this->render_stack);
-        $renderer = $this->renderer();
+        $renderer = $this->getRenderer();
         $renderer->setRenderOptions($this->getRenderOptions());
 
         if(false === $this->is_rendered) {
-            $renderer->render();
+            if(!$renderer->isRendered()){
+                $renderer->render();
+            }
+            
             $name = substr(get_class($renderer), strlen('ImagineRenderer'));
             foreach($this->filters as $filter) {
                 $data = call_user_func(array($filter, 'render'.$name), $renderer->pickData());
@@ -57,14 +60,14 @@ abstract class ImagineBehaviourRenderizable {
         array_push($this->filters, $filter);
         return $this;
     }
-    public function renderer() {
+    public function getRenderer() {
         return $this->renderer;
     }
     public function save($filename) {
         if(false === $this->is_rendered) {
             $this->render();
         }
-        $this->renderer()->saveFile($filename);
+        $this->getRenderer()->saveFile($filename);
         return $this;
     }
     public function addToRenderStack($renderer) {
@@ -80,7 +83,7 @@ abstract class ImagineBehaviourRenderizable {
         if($this->hasParent()){
             $this->getParent()->touch();
         }
-        $this->renderer()->touch();
+        $this->getRenderer()->touch();
         $this->is_rendered = false;
     }
     protected function setRenderOption($option, $value) {
