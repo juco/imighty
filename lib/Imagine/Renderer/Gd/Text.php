@@ -19,18 +19,14 @@ class ImagineRendererGdText extends ImagineRendererGdTextRenderer {
     }
     protected function getLayerWidth(){
         $layer = $this->getRenderer()->getLayer();
-        $layer_width = $layer->width();
-
-        if(0 === $layer_width){
-            $parent = $layer;
-            while($parent->hasParent()){
-                $parent = $parent->getParent();
-                if($layer_width = $parent->width()){
-                    break;
-                }
-            }
+        if($layer->width() == '100%'){
+            $dimmension = $layer->getParent()->getDimmension();
+            $width = $dimmension['width'] - $layer->margin('left') - $layer->margin('right') - $layer->padding('left') - $layer->padding('right');
+        } else {
+            $width = $layer->width();
         }
-        return $layer_width;
+        
+        return $width;
     }
     protected function processBlocks($blocks, &$layer_width, &$x = 0, &$y = 0) {
         // 

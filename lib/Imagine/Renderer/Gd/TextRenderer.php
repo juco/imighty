@@ -27,18 +27,11 @@ class ImagineRendererGdTextRenderer {
 
     protected function render($blocks, $layer_width) {
         $real_height = $this->getRealHeight($blocks);
-
         $scaled_img = imagecreatetruecolor ($layer_width*$this->exp, $real_height*$this->exp);
         
-        $background = $this->getRenderer()->getLayer()->background();
-        if($background == 'transparent'){
-            $background_color = imagecolortransparent($scaled_img, imagecolorallocatealpha($scaled_img, 0, 0, 0, 127));
-        } else {
-            $bg_channels = ImagineRendererGd::hex_to_rgb($background);
-            $background_color = imagecolorallocate($scaled_img, $bg_channels['r'], $bg_channels['g'], $bg_channels['b']);
-        }
-
+        $background_color = imagecolortransparent($scaled_img, imagecolorallocatealpha($scaled_img, 0, 0, 0, 127));
         imagefill($scaled_img, 0, 0, $background_color);
+
         // render backgrounds
         foreach ($blocks as $block) {
             $this->renderBackgroundBlock($block, $block['style'], $scaled_img);
@@ -53,7 +46,7 @@ class ImagineRendererGdTextRenderer {
         $transparent_color = imagecolortransparent($output_img, imagecolorallocatealpha($output_img, 0, 0, 0, 127));
         imagefill($output_img, 0, 0, $transparent_color);
         imagecopyresampled($output_img, $scaled_img, 0, 0, 0, 0, $layer_width, $real_height, $layer_width*$this->exp, $real_height*$this->exp);
-        
+
         $this->renderer->sendData(array(
                 'width' => $layer_width,
                 'height' => $real_height,

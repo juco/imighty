@@ -4,31 +4,8 @@ class ImagineLayerText extends ImagineLayerLayer {
 
     protected
             $styles = array(),
-            $text = '',
-            $padding = array(
-                'top' => 0,
-                'left' => 0,
-                'right' => 0,
-                'bottom' => 0
-            );
+            $text = '';
 
-    public function padding(){
-        $args = func_get_args();
-
-        if(sizeof($args) == 1 && is_string($args[0])){
-            return $this->padding[$args[0]];
-        } else if(sizeof($args)==2 && is_int($args[1]) && is_string($args[0])){
-            $this->padding[$args[0]] = $args[1];
-        } else if(sizeof($args)==1 && is_int($args[0])){
-            foreach(array_keys($this->padding) as $border){
-                $this->padding[$border] = $args[0];
-            }
-        } else {
-            throw new Exception('No valid data.');
-        }
-        
-        return $this;
-    }
 
     public function style() {
         $args = func_get_args();

@@ -129,7 +129,27 @@ class ImagineRendererGd extends ImagineRendererRenderer {
         $renderer = $child->getRenderer();
         $child_resource = $renderer->getResource();
         $position = $renderer->getRenderOption('boundaries');
+        $background = $child->background();
 
+        if($background != 'transparent') {
+
+            $bg = ImagineRendererGd::hex_to_rgb($background);
+            $padding = $child->padding();
+            $bg_color = imagecolorallocate($data['resource'], $bg['r'], $bg['g'], $bg['b']);
+            $x1 = $position['left'] - $padding['left'];
+            $y1 = $position['top'] - $padding['top'];
+            $x2 = $data['width'] - $position['right'] + $padding['right'];
+            $y2 = $data['height'] - $position['bottom'] + $padding['bottom'];
+            
+            imagefilledrectangle(
+                    $data['resource'],
+                    $x1,
+                    $y1,
+                    $x2,
+                    $y2,
+                    $bg_color
+            );
+        }
         imagecopy(
                 $data['resource'],
                 $child_resource,

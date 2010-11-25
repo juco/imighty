@@ -2,11 +2,13 @@
 class ImagineBehaviourSizable extends ImagineBehaviourRenderizable {
 
     private
-            $height = 0,
             $width = 0,
+            $height = 0,
             $crop = "stretch",
             $offset = array('top' => 50, 'left' => 50),
-            $multiplier = array('top' => .5, 'left' => .5);
+            $multiplier = array('top' => .5, 'left' => .5),
+            $margins = array('top' => 0, 'left' => 0, 'bottom' => 0, 'right' => 0),
+            $paddings = array('top' => 0, 'left' => 0, 'bottom' => 0, 'right' => 0);
 
 
 
@@ -20,8 +22,8 @@ class ImagineBehaviourSizable extends ImagineBehaviourRenderizable {
         $this->touch();
         return $this;
     }
-    protected function configure(){
-        
+    protected function configure() {
+
         $this->configureRenderOption('offset', array('top' => 0, 'left' => 0));
         $this->configureRenderOption('multiplier', array('top' => .5, 'left' => .5));
         $this->configureRenderOption('dimmension', array('height' => 0, 'width' => 0));
@@ -30,20 +32,20 @@ class ImagineBehaviourSizable extends ImagineBehaviourRenderizable {
     public function width($width = false) {
 
         if($width === false) {
- 
+
             return $this->width;
         }
         $this->touch();
         $this->width = $width;
         return $this;
     }
-    public function offsetTop($percent = 50){
+    public function offsetTop($percent = 50) {
         $this->offset['top'] = $percent;
 
         $this->touch();
         return $this;
     }
-    public function offsetLeft($percent = 50){
+    public function offsetLeft($percent = 50) {
         $this->offset['left'] = $percent;
 
         $this->touch();
@@ -76,15 +78,15 @@ class ImagineBehaviourSizable extends ImagineBehaviourRenderizable {
         $rdr_dimmension = $this->getRenderer()->getDimmension();
         $rdr_ratio = $rdr_dimmension['height'] / $rdr_dimmension['width'];
         if($this->crop === "crop" || $this->crop === "fit") {
-            
+
             $pixoffset = array('top' => 0, 'left' => 0);
             $ratio = $dimmension['height'] / $dimmension['width'];
             $rdr_dimmension = $this->getRenderer()->getDimmension();
             $rdr_ratio = $rdr_dimmension['height'] / $rdr_dimmension['width'];
             $has_horiz_offset = $ratio > $rdr_ratio;
             $multiplier = array('top' => .5, 'left' => .5);
-            if($this->crop === "crop"){
-                if($has_horiz_offset){
+            if($this->crop === "crop") {
+                if($has_horiz_offset) {
                     $propor = $this->getRenderer()->getHeight() / $dimmension['height'];
                     $multiplier['left'] = $this->offset['left'] / 100;
                     $pixoffset['left'] = ($dimmension['height'] / $rdr_ratio - $dimmension['width']) * $propor;
@@ -94,18 +96,40 @@ class ImagineBehaviourSizable extends ImagineBehaviourRenderizable {
                     $pixoffset['top'] = ($dimmension['width'] * $rdr_ratio - $dimmension['height']) * $propor;
 
                 }
-            } else if($this->crop === "fit"){
-
+            } else if($this->crop === "fit") {
+                // TODO: this possibility
             }
-            
+
             $this->setRenderOption('offset', $pixoffset);
             $this->setRenderOption('multiplier', $multiplier);
         }
         $this->setRenderOption('dimmension', $dimmension);
-        if(false === $this->is_rendered){
+        if(false === $this->is_rendered) {
             parent::render();
         }
 
+    }
+    public function margin() {
+        $args = func_get_args();
+        if(!sizeof($args)) {
+            return $this->margins;
+        } else if(sizeof($args) == 1 && is_string($args[0])) {
+            return $this->margins[$args[0]];
+        } else if(sizeof($args)==2 && is_string($args[0]) && is_int($args[1])) {
+            $this->margins[$args[0]] = $args[1];
+        }
+        return $this;
+    }
+    public function padding() {
+        $args = func_get_args();
+        if(!sizeof($args)) {
+            return $this->paddings;
+        } else if(sizeof($args) == 1 && is_string($args[0])) {
+            return $this->paddings[$args[0]];
+        } else if(sizeof($args)==2 && is_string($args[0]) && is_int($args[1])) {
+            $this->paddings[$args[0]] = $args[1];
+        }
+        return $this;
     }
     public function getDimmension() {
         $rdim = $this->getRenderer()->getDimmension();
@@ -113,16 +137,48 @@ class ImagineBehaviourSizable extends ImagineBehaviourRenderizable {
             return $rdim;
         }
 
-        $prop = $rdim['height'] / $rdim['width'];
 
-        if(!$this->width) {
-            $this->width = $this->height / $prop;
-        } else if(!$this->height) {
-            $this->height = $this->width * $prop;
+
+        $will_span = array();
+        if(is_string($this->width) && $this->width == '100%') {
+            $will_span[] = 'width';
         }
+        if(is_string($this->height) && $this->height == '100%') {
+            $will_span[] = 'height';
+        }
+
+        $width = $height = 0;
+        if(sizeof($will_span)) {
+            if(!$this->hasParent()) {
+                throw new Exception("No parent for this 100% dimmension.");
+            } else {
+                $dimmension = $this->getParent()->getDimmension();
+                $map = array('width' => array('left', 'right'), 'height' => array('top', 'bottom'));
+                foreach($will_span as $axis) {
+
+                    $$axis = (int) $dimmension[$axis];
+                    foreach($map[$axis] as $border){
+                        $$axis -=  $this->margins[$border] + $this->paddings[$border];
+                    }
+                }
+            }
+        } else {
+            $width = (int) $this->width;
+            $height = (int) $this->height;
+        }
+        if(!$width || !$height) {
+            $prop = $rdim['height'] / $rdim['width'];
+
+            if(!$width) {
+                $width = $height / $prop;
+            } else if(!$height) {
+                $height = $width * $prop;
+            }
+        }
+
         return array(
-                "width" => $this->width,
-                "height" => $this->height
+                "width" => $width,
+                "height" => $height
         );
     }
 
@@ -136,7 +192,7 @@ class ImagineBehaviourSizable extends ImagineBehaviourRenderizable {
         if(false === $border) return $this->offset;
         return $this->offset[$border];
     }
-    public function getMultiplier($border = false){
+    public function getMultiplier($border = false) {
         if(false === $border) return $this->multiplier;
         return $this->multiplier[$border];
     }

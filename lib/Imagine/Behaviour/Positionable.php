@@ -106,17 +106,20 @@ abstract class ImagineBehaviourPositionable extends ImagineBehaviourSizable {
 
         $pdim = $this->getParent()->getDimmension();
         $dim = parent::getDimmension();
+        $margins = $this->margin();
+        $paddings = $this->padding();
         foreach($borders as $border => $options) {
             if(isset($borders[$border])) {
                 $opposite = $temp = $options["opposite"];
                 if(false === $this->$border) {
                     $opposite = $border;
                     $border = $temp;
+                    
                 }
                 unset($temp);
-                $boundaries[$border] = $this->$border;
+                $boundaries[$border] = $this->$border + $options['operator'] * ($margins[$border] + $paddings[$border]);
                 $add = $this->$border + $dim[$options['orientation']];
-                $boundaries[$opposite] = $pdim[$options["orientation"]] - $add  * $options["operator"];
+                $boundaries[$opposite] = $pdim[$options["orientation"]] - ($add + $margins[$border] + $paddings[$border])  * $options["operator"];
                 unset($borders[$border], $borders[$opposite]);
             }
         }

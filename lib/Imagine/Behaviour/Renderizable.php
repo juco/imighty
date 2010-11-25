@@ -96,6 +96,12 @@ abstract class ImagineBehaviourRenderizable {
     private function getRenderOptions() {
         return $this->render_options;
     }
+    public function getRenderOption($option){
+        if(!isset($this->render_options[$option])){
+            throw new Exception('This renderizable has no render option: '.$option);
+        }
+        return $this->render_options[$option];
+    }
     protected function configureRenderOption($option, $default = false) {
         $this->render_options[$option] = $default;
     }
