@@ -44,7 +44,7 @@ class ImagineRendererGdText extends ImagineRendererGdTextRenderer {
                 } else {
                     $max_width = $layer_width;
                 }
-
+                $y += $style->margin_top();
                 if(!$max_width) {
                     $metrix = $this->getMetrics($block['value'], $style);
                     $output[] = array(
@@ -65,6 +65,7 @@ class ImagineRendererGdText extends ImagineRendererGdTextRenderer {
                     }
                 } else {
                     $output = array_merge($output, $this->lineSplit($block['value'], $max_width, $style, $x, $y));
+                    $y += $style->margin_bottom();
                 }
 
             } else {
@@ -73,7 +74,7 @@ class ImagineRendererGdText extends ImagineRendererGdTextRenderer {
 
             }
             if($style->display() == "block" && !is_int($which)) {
-                $y += $style->line_height();
+                $y += $style->line_height() + $style->margin_bottom();
                 $x = 0;
 
             }

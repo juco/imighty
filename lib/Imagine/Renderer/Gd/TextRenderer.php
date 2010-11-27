@@ -1,9 +1,4 @@
 <?php
-/* 
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
-*/
-
 /**
  * Description of TextRenderer
  *
@@ -16,7 +11,7 @@ class ImagineRendererGdTextRenderer {
 
     public function __construct(ImagineRendererGd $renderer) {
         $this->renderer = $renderer;
-        $this->exp = 8;
+        $this->exp = 1;
     }
 
     public function getRenderer() {

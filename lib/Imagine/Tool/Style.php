@@ -22,7 +22,9 @@ class ImagineToolStyle {
             $maxwidth = false,
             $display = 'inline',
             $font_weight = 'normal',
-            $font_style = 'normal';
+            $font_style = 'normal',
+            $margin_top = 0,
+            $margin_bottom = 0;
 
     protected $touched = array();
 
