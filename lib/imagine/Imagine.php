@@ -1,6 +1,6 @@
 <?php
 
-require_once("Core.php");
+require_once("Core.php"); 
 
 class Imagine extends ImagineCore {
     
