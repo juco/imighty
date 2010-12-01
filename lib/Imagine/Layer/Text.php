@@ -59,6 +59,15 @@ class ImagineLayerText extends ImagineLayerLayer {
         }
         parent::render();
     }
+    
+    public function getHtmlDom() {
+        $text = $this->text;
+        if (!preg_match('/^\s*<root/', $text)) {
+            $text = '<root>' . $text . '</root>';
+        }
+
+        return $this->getHtmlStructure($text);
+    }
 
     public function processText($blocks = false, $current_style = false) {
 
@@ -83,14 +92,6 @@ class ImagineLayerText extends ImagineLayerLayer {
         return $out;
     }
 
-    public function getHtmlDom() {
-        $text = $this->text;
-        if (!preg_match('/^\s*<root/', $text)) {
-            $text = '<root>' . $text . '</root>';
-        }
-
-        return $this->getHtmlStructure($text);
-    }
 
     protected function getHtmlStructure($data) {
         /* mvo voncken@mailandnews.com
