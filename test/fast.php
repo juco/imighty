@@ -24,7 +24,7 @@ $text = Imagine::text()->
         margin('bottom', 20)->
         margin('left', 20)->
         style('default', array('size' => 16, 'line_height' => 20))->
-        style('h1', array('display' => 'block', 'size' => 32, 'line_height' => 40, 'font_weight' => 'bold'))->
+        style('h1', array('display' => 'block', 'size' => 32, 'line_height' => 40, 'font_weight' => 'bold', 'margin_bottom' => 11, 'margin_top' => 11))->
         style('p', array('display' => 'block'))->
         style('em', array())->
         style('a', array('font_weight' => 'bold'))->
@@ -48,6 +48,8 @@ $image = Imagine::image()->
         width('500')->
         crop();
 
+
+//$include->down($text);
 
 
 $image->save("vertical.jpg");
