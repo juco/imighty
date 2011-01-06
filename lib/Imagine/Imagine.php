@@ -4,7 +4,7 @@ require_once("Core.php");
 
 class Imagine extends ImagineCore {
     
-    public function configureTools() {
+    public static function configureTools() {
         return array(
                 "layer" => "ImagineLayerLayer",
                 "image" => "ImagineLayerImage",
@@ -12,12 +12,12 @@ class Imagine extends ImagineCore {
         );
     }
 
-    public function configureFilters(){
+    public static function configureFilters(){
         return array(
           'grayscale' => 'ImagineFilterGrayscale'
         );
     }
-    public function configureFonts(){
+    public static function configureFonts(){
         return array(
             'arial' => 'arial',
             'arial_bold' => 'arialbd',
@@ -27,7 +27,7 @@ class Imagine extends ImagineCore {
         );
     }
     
-    public function configureAutoload(){
+    public static function configureAutoload(){
         return array();
     }
 }
