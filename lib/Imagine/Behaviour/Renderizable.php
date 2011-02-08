@@ -47,8 +47,8 @@ abstract class ImagineBehaviourRenderizable {
             $this->configuration = $this->imagine->getConfiguration();
         }
         $renderer_class = "ImagineRenderer".ucfirst($this->configuration->renderer);
-        $reflection_class = new ReflectionClass($renderer_class);
-        $this->renderer = $reflection_class->newInstance($imagine);
+        
+        $this->renderer = new $renderer_class($imagine);
         $this->renderer->setConfiguration($this->configuration);
         $this->renderer->setLayer($this);
         $this->configure();
@@ -86,6 +86,10 @@ abstract class ImagineBehaviourRenderizable {
         array_push($this->filters, $filter);
         return $this;
     }
+    /**
+     *
+     * @return ImagineRendererGd
+     */
     public function getRenderer() {
         return $this->renderer;
     }
@@ -94,6 +98,14 @@ abstract class ImagineBehaviourRenderizable {
             $this->render();
         }
         $this->getRenderer()->saveFile($filename);
+        return $this;
+    }
+    public function toBrowser() {
+        if(false === $this->is_rendered) {
+            $this->render();
+        }
+        
+        $this->getRenderer()->toBrowser();
         return $this;
     }
     public function addToRenderStack($renderer) {

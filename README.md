@@ -1,7 +1,8 @@
 Imagine. The easy-to-use gd wrapper for image manipulation.
 ===
 
-To load:
+To load
+---
     include('path-to-imagine/Imagine.php');
     Imagine::configuration(array(
             "input" => PATH_TO_PUBLIC_DIR."/images/",

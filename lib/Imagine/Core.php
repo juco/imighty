@@ -103,7 +103,7 @@ class ImagineCore {
     public static function setDefaultConfiguration($configuration) {
         self::$default_configuration = $configuration;
     }
-
+    
     public static function __callStatic($name, $arguments) {
 
         return call_user_func_array(array(self::getInstance(), $name), $arguments);
@@ -152,11 +152,16 @@ class ImagineCore {
 
         self::registerAutoloadClasses($class, "Tools");
         self::registerAutoloadClasses($class, "Filters");
-        self::registerFonts($class);
+
+        if(method_exists($class, "getFontsDir")) {
+            $font_dir = call_user_func($class."::getFontsDir");
+        } else {
+            $font_dir = realpath(__DIR__.'/../asset/fonts');
+        }
+        self::registerFonts($class, $font_dir);
 
         self::$registered = true;
     }
-
     protected static function registerAutoloadClasses($class, $type) {
 
         if(method_exists($class, 'configure'.$type)) {
@@ -210,8 +215,8 @@ class ImagineCore {
         }
     }
 
-    public static function registerFonts($class){
-        $dirname = realpath(__DIR__.'/../asset/fonts');
+    public static function registerFonts($class, $dir){
+        $dirname = $dir;
         if(method_exists($class, 'configureFonts')){
             $fonts = call_user_func($class.'::configureFonts');
             if(is_array($fonts)) {

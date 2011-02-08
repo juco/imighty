@@ -1,4 +1,5 @@
 <?php
+
 /*
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -25,52 +26,52 @@
  * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link        https://github.com/botverse/imagine
  */
+
 class ImagineRendererGd extends ImagineRendererRenderer {
+
     protected $imagine;
-
-    protected static $text = false;
-
-
+    protected $text = false;
 
     public function loadFile($filename = "") {
         $types = self::$_types;
         $_imagecreatefunction = self::$_core_settings["_imagecreatefunction"];
 
-        if(!$types || !$_imagecreatefunction) {
-            throw new Exception("No se han recibido los tipos de archivo, imagecreatefunction: ".$_imagecreatefunction);
+        if (!$types || !$_imagecreatefunction) {
+            throw new Exception("No se han recibido los tipos de archivo, imagecreatefunction: " . $_imagecreatefunction);
         }
 
         $configuration = $this->getConfiguration();
-        if(false !== $configuration->input) {
-            $new_filename = rtrim($configuration->input, "/")."/".ltrim($filename, "/");
+        if (false !== $configuration->input) {
+            $new_filename = rtrim($configuration->input, "/") . "/" . ltrim($filename, "/");
         }
 
-        if(file_exists($new_filename)) {
+        if (file_exists($new_filename)) {
             $filename = $new_filename;
         } else {
-            if(!file_exists($filename)) {
-                throw new Exception("Not a file: ".$filename);
+            if (!file_exists($filename)) {
+                throw new Exception("Not a file: " . $filename);
             }
         }
 
         $info = getimagesize($filename);
 
         $imagedata = array(
-                'width' => $info[0],
-                'height' => $info[1],
-                'bias' => ($info[0] >= $info[1])?"horizontal":"vertical",
-                'aspectratio' => $info[0] / $info[1],
-                'type' => $info[2],
-                'resource' => null
+            'width' => $info[0],
+            'height' => $info[1],
+            'bias' => ($info[0] >= $info[1]) ? "horizontal" : "vertical",
+            'aspectratio' => $info[0] / $info[1],
+            'type' => $info[2],
+            'resource' => null
         );
 
         if ($types[$imagedata['type']]['supported'] < 1) {
-            throw new Exception('Imagetype ('.$types[$imagedata['type']]['ext'].') not supported for reading.');
+            throw new Exception('Imagetype (' . $types[$imagedata['type']]['ext'] . ') not supported for reading.');
             return null;
         }
 
         switch ($imagedata['type']) {
             case 1:
+                $imagedata['type_string'] = 'image/gif';
                 $dummy = imagecreatefromgif($filename);
                 $functionname = $_imagecreatefunction;
                 $imagedata['resource'] = $functionname($imagedata['width'], $imagedata['height']);
@@ -79,10 +80,12 @@ class ImagineRendererGd extends ImagineRendererRenderer {
                 break;
 
             case 2:
+                $imagedata['type_string'] = 'image/jpeg';
                 $imagedata['resource'] = imagecreatefromjpeg($filename);
                 break;
 
             case 3:
+                $imagedata['type_string'] = 'image/png';
                 $dummy = imagecreatefrompng($filename);
                 if (imagecolorstotal($dummy) != 0) {
                     $functionname = $_imagecreatefunction;
@@ -101,23 +104,55 @@ class ImagineRendererGd extends ImagineRendererRenderer {
 
         $this->original_data = $imagedata;
     }
+    public function getContentType() {
+        return $this->original_data['type_string'];
+    }
+
+    public function createResource($dimmension) {
+        $imagedata = array(
+            'width' => $dimmension['width'],
+            'height' => $dimmension['height'],
+            'bias' => ($dimmension['width'] >= $dimmension['height']) ? "horizontal" : "vertical",
+            'aspectratio' => $dimmension['width'] / $dimmension['height'],
+            'type_string' => 'image/jpeg',
+            'resource' => imagecreatetruecolor($dimmension['width'], $dimmension['height'])
+        );
+        $this->original_data = $imagedata;
+    }
 
     public function saveFile($filename) {
+        
         $configuration = $this->getConfiguration();
 
-        if(false !== $configuration->output) {
-            $new_filename = rtrim($configuration->output, "/")."/".ltrim($filename, "/");
+        if (false !== $configuration->output) {
+            $new_filename = rtrim($configuration->output, "/") . "/" . ltrim($filename, "/");
         }
 
-        if(is_dir(dirname($new_filename))) {
+        if (is_dir(dirname($new_filename))) {
             $filename = $new_filename;
         } else {
-            if(!is_dir(dirname($filename))) {
-                throw new Exception("Not a dir: ".dirname($filename));
+            if (!is_dir(dirname($filename))) {
+                throw new Exception("Not a dir: " . dirname($filename));
             }
         }
 
-        imagepng($this->getResource(), $new_filename);
+        imagejpeg($this->getResource(), $new_filename, 100);
+    }
+
+    public function toBrowser() {
+
+        $im = $this->pickData();
+        header('Content-Type: ' . $this->getContentType());
+        // Output the image
+        switch ($this->getContentType()) {
+            case 'image/jpeg':
+                imagejpeg($im['resource']);
+                break;
+        }
+        // Free up memory
+        imagedestroy($im['resource']);
+
+        exit();
     }
 
     public function resize() {
@@ -127,8 +162,8 @@ class ImagineRendererGd extends ImagineRendererRenderer {
         $multiplier = $this->getRenderOption('multiplier');
         $dimmension = $this->getRenderOption('dimmension');
 
-        $width = $dimmension['width']? $dimmension['width']:$data['width'];
-        $height = $dimmension['height']? $dimmension['height']:$data['height'];
+        $width = $dimmension['width'] ? $dimmension['width'] : $data['width'];
+        $height = $dimmension['height'] ? $dimmension['height'] : $data['height'];
 
         $new_image = imagecreatetruecolor($width, $height);
         imagecopyresampled(
@@ -157,7 +192,7 @@ class ImagineRendererGd extends ImagineRendererRenderer {
         $position = $renderer->getRenderOption('boundaries');
         $background = $child->background();
 
-        if($background != 'transparent') {
+        if ($background != 'transparent') {
 
             $bg = ImagineRendererGd::hex_to_rgb($background);
             $padding = $child->padding();
@@ -166,7 +201,7 @@ class ImagineRendererGd extends ImagineRendererRenderer {
             $y1 = $position['top'] - $padding['top'];
             $x2 = $data['width'] - $position['right'] + $padding['right'];
             $y2 = $data['height'] - $position['bottom'] + $padding['bottom'];
-            
+
             imagefilledrectangle(
                     $data['resource'],
                     $x1,
@@ -190,36 +225,39 @@ class ImagineRendererGd extends ImagineRendererRenderer {
         $this->sendData($data);
         $this->is_rendered = true;
     }
-
+    /**
+     *
+     * @return ImagineRendererGdText
+     */
     public function text() {
-        if(false === self::$text) {
-            self::$text = new ImagineRendererGdText($this);
+        if (false === $this->text) {
+           $this->text = new ImagineRendererGdText($this);
         }
-        return self::$text;
+        return $this->text;
     }
+
     /*
      * Static
-    */
+     */
 
     protected static
-            $_core_settings = array();
-
-    protected static $_types = array (
-            1 => array (
-                            'ext' => 'gif',
-                            'mime' => 'image/gif',
-                            'supported' => 0
-            ),
-            2 => array (
-                            'ext' => 'jpg',
-                            'mime' => 'image/jpeg',
-                            'supported' => 0
-            ),
-            3 => array (
-                            'ext' => 'png',
-                            'mime' => 'image/png',
-                            'supported' => 0
-            )
+    $_core_settings = array();
+    protected static $_types = array(
+        1 => array(
+            'ext' => 'gif',
+            'mime' => 'image/gif',
+            'supported' => 0
+        ),
+        2 => array(
+            'ext' => 'jpg',
+            'mime' => 'image/jpeg',
+            'supported' => 0
+        ),
+        3 => array(
+            'ext' => 'png',
+            'mime' => 'image/png',
+            'supported' => 0
+        )
     );
 
     public static function initCore() {
@@ -248,7 +286,7 @@ class ImagineRendererGd extends ImagineRendererRenderer {
         if (!isset($settings["gd_info"][$key])) {
             $key = 'JPG Support';
         }
-        if($settings["gd_info"][$key]) {
+        if ($settings["gd_info"][$key]) {
             self::$_types[2]['supported'] = 2;
         }
         if ($settings["gd_info"]['PNG Support']) {
@@ -257,10 +295,11 @@ class ImagineRendererGd extends ImagineRendererRenderer {
         self::$_core_settings = $settings;
         self::$_core_initialized = true;
     }
+
     public static function hex_to_rgb($c) {
         $c = trim($c, ' #');
-        if(strlen($c) == 3) {
-            $c = $c[0].$c[0].$c[1].$c[1].$c[2].$c[2];
+        if (strlen($c) == 3) {
+            $c = $c[0] . $c[0] . $c[1] . $c[1] . $c[2] . $c[2];
         }
         preg_match("/(.{2})(.{2})(.{2})/", $c, $matches);
         list($whole, $r, $g, $b) = $matches;
@@ -270,6 +309,7 @@ class ImagineRendererGd extends ImagineRendererRenderer {
         $rgb['g'] = hexdec($g);
         $rgb['b'] = hexdec($b);
 
-        return $rgb ;
+        return $rgb;
     }
+
 }

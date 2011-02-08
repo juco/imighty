@@ -29,7 +29,7 @@ class ImagineRendererGdText extends ImagineRendererGdTextRenderer {
     public function write($blocks) {
         $layer_width = $this->getLayerWidth();
 
-        $blocks = $this->processBlocks($blocks, $layer_width); // $x and $y by reference = 0
+        $blocks = $this->processBlocks($blocks, $layer_width);
         $this->render($blocks, $layer_width);
 
     }

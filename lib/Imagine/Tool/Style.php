@@ -30,7 +30,7 @@ class ImagineToolStyle {
             $font = 'sans',
             $size = 16,
             $line_height = 20,
-            $color = '#0f0',
+            $color = '#fff',
             $background = false,
             $transparent = true,
             $alias = false,
@@ -93,18 +93,20 @@ class ImagineToolStyle {
             $this->$key($value);
         }
     }
-    public function font($file = false) {
-        if(false === $file) {
-            return $this->font;
-        }
+    public function getFont() {
         $font = $this->font;
         if($this->font_weight == "bold"){
             $font .= '_bold';
         }
+        if($this->font_weight == "black"){
+            $font .= '_black';
+        }
         if($this->font_style == "italic"){
             $font .= '_italic';
         }
-        return Imagine::getFont($font);
+        $font = Imagine::getFont($font);
+        return $font;
+
     }
 }
 ?>
