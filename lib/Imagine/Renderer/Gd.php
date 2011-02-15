@@ -114,7 +114,7 @@ class ImagineRendererGd extends ImagineRendererRenderer {
             'height' => $dimmension['height'],
             'bias' => ($dimmension['width'] >= $dimmension['height']) ? "horizontal" : "vertical",
             'aspectratio' => $dimmension['width'] / $dimmension['height'],
-            'type_string' => 'image/jpeg',
+            'type_string' => 'unknown',
             'resource' => imagecreatetruecolor($dimmension['width'], $dimmension['height'])
         );
         $this->original_data = $imagedata;
@@ -140,11 +140,13 @@ class ImagineRendererGd extends ImagineRendererRenderer {
         switch($path['extension']){
             case 'jpg':
                 imagejpeg($this->getResource(), $new_filename, 75);
+                $this->rendered_data['type_string'] = 'image/jpeg';
                 break;
             case 'png':
                 imagetruecolortopalette($im, false, 255);
                 imagesavealpha($im, true);
                 imagepng($this->getResource(), $new_filename);
+                $this->rendered_data['type_string'] = 'image/png';
                 break;
         }
         
@@ -153,11 +155,15 @@ class ImagineRendererGd extends ImagineRendererRenderer {
     public function toBrowser() {
 
         $im = $this->pickData();
-        header('Content-Type: ' . $this->getContentType());
+        header('Content-Type: ' . $im['type_string']);
         // Output the image
-        switch ($this->getContentType()) {
+        switch ($im['type_string']) {
             case 'image/jpeg':
+            case 'image/jpg':
                 imagejpeg($im['resource']);
+                break;
+            case 'image/png':
+                imagepng($im['resource']);
                 break;
         }
         // Free up memory
