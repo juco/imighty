@@ -77,7 +77,12 @@ class ImagineCore {
     public static function setDefaultConfiguration($configuration) {
         self::$default_configuration = $configuration;
     }
-    
+    /**
+     *
+     * @param string $name
+     * @param array $arguments
+     * @return ImagineLayerLayer
+     */
     public static function __callStatic($name, $arguments) {
 
         return call_user_func_array(array(self::getInstance(), $name), $arguments);

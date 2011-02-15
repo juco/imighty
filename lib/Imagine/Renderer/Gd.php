@@ -108,8 +108,19 @@ class ImagineRendererGd extends ImagineRendererRenderer {
                 throw new Exception("Not a dir: " . dirname($filename));
             }
         }
-
-        imagejpeg($this->getResource(), $new_filename, 100);
+        
+        $path = pathinfo($new_filename);
+        switch($path['extension']){
+            case 'jpg':
+                imagejpeg($this->getResource(), $new_filename, 75);
+                break;
+            case 'png':
+                imagetruecolortopalette($im, false, 255);
+                imagesavealpha($im, true);
+                imagepng($this->getResource(), $new_filename);
+                break;
+        }
+        
     }
 
     public function toBrowser() {

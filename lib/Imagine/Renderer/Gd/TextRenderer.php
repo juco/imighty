@@ -14,7 +14,10 @@ class ImagineRendererGdTextRenderer {
         $this->renderer = $renderer;
         $this->exp = 2;
     }
-
+    /**
+     *
+     * @return ImagineRendererGd
+     */
     public function getRenderer() {
         return $this->renderer;
     }
@@ -41,11 +44,16 @@ class ImagineRendererGdTextRenderer {
         }
 
         $output_img = imagecreatetruecolor($layer_width, $real_height);
-        
-        $transparent_color = imagecolortransparent(
-                $output_img,
-                imagecolorallocatealpha($output_img, 0, 0, 0, 127));
 
+        $background = $this->getRenderer()->getLayer()->background();
+        if(false === $background){
+            $transparent_color = imagecolortransparent(
+                    $output_img,
+                    imagecolorallocatealpha($output_img, 0, 0, 0, 127));
+        } else {
+            $bg = ImagineRendererGd::hex_to_rgb($background);
+            $transparent_color = imagecolorallocate($output_img, $bg['r'], $bg['g'], $bg['b']);
+        }
         imagefill($output_img, 0, 0, $transparent_color);
         imagecopyresampled(
                 $output_img, $scaled_img,
