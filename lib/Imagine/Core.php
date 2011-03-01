@@ -193,7 +193,7 @@ class ImagineCore {
         }
         array_push($dirs, dirname(__FILE__));
 
-        $current_path = realpath(__DIR__."../");
+        $current_path = preg_replace('/Imagine\/$/', '', __DIR__);
 
         foreach($dirs as $dir) {
             if(!in_array($dir, self::$registered_autoload_dirs)) {
