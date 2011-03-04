@@ -125,7 +125,11 @@ class ImagineBehaviourSizable extends ImagineBehaviourRenderizable {
                     $pixoffset['top'] = ($dimmension['width'] * $rdr_ratio - $dimmension['height']) * $propor;
                 }
             } else if ($this->crop === "fit") {
-                // TODO: fit possibility
+                if ($has_horiz_offset) {
+                  $dimmension['height'] = $dimmension['width'] * $rdr_ratio;
+                } else {
+                  $dimmension['width'] = $dimmension['height'] / $rdr_ratio;
+                }
             }
 
             $this->setRenderOption('offset', $pixoffset);
