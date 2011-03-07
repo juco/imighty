@@ -44,7 +44,6 @@ class ImagineRendererGd extends ImagineRendererRenderer {
         if (false !== $configuration->input) {
             $new_filename = rtrim($configuration->input, "/") . "/" . ltrim($filename, "/");
         }
-
         if (file_exists($new_filename)) {
             $filename = $new_filename;
         } else {

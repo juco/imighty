@@ -260,9 +260,10 @@ class ImagineCore {
     }
 
     public static function rglob($pattern, $path = '', $flags = 0) {
-        $paths = glob($path.'*', GLOB_MARK|GLOB_ONLYDIR|GLOB_NOSORT);
-        $files = glob($path.$pattern, $flags);
-        foreach ($paths as $path) {
+        $paths = glob($path.'/*', GLOB_MARK|GLOB_ONLYDIR|GLOB_NOSORT);
+        
+        $files = glob($path.'/'.$pattern, $flags);
+        if($paths)foreach ($paths as $path) {
             $files = array_merge($files, self::rglob($pattern, $path, $flags));
         }
         return $files;
