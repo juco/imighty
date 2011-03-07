@@ -44,9 +44,7 @@ class ImagineCore {
 
     public function __construct($configuration) {
 
-        if(false === self::$registered) {
-            self::register();
-        }
+        
 
         if(false !== $configuration) {
 
@@ -61,6 +59,9 @@ class ImagineCore {
             } else {
                 $this->configuration = new ImagineConfiguration();
             }
+        }
+        if(false === self::$registered) {
+            self::register($this->configuration);
         }
     }
 
@@ -125,8 +126,7 @@ class ImagineCore {
     public static function getInstance($configuration = false) {
 
         if(false === self::$instance) {
-            $class = get_called_class();
-            $imagine = new $class($configuration);
+            $imagine = new self($configuration);
             self::$instance = $imagine;
         }
 
@@ -142,28 +142,26 @@ class ImagineCore {
             self::$included_vendors[$name] = true;
         }
     }
-    public static function register() {
+    public static function register($configuration) {
 
         if(false !== self::$registered) {
             throw new Exception("Already registered.");
         }
 
-        $class = get_called_class();
-        
-        if(method_exists($class, "configureAutoload")) {
-            $dirs = call_user_func($class."::configureAutoload");
+        if(method_exists($configuration->class, "configureAutoload")) {
+            $dirs = call_user_func($configuration->class."::configureAutoload");
         }
         self::registerAutoloadDirs($dirs);
 
-        self::registerAutoloadClasses($class, "Tools");
-        self::registerAutoloadClasses($class, "Filters");
+        self::registerAutoloadClasses($configuration->class, "Tools");
+        self::registerAutoloadClasses($configuration->class, "Filters");
 
-        if(method_exists($class, "getFontsDir")) {
-            $font_dir = call_user_func($class."::getFontsDir");
+        if(method_exists($configuration->class, "getFontsDir")) {
+            $font_dir = call_user_func($configuration->class."::getFontsDir");
         } else {
-            $font_dir = realpath(__DIR__.'/../asset/fonts');
+            $font_dir = realpath(dirname(__FILE__).'/../asset/fonts');
         }
-        self::registerFonts($class, $font_dir);
+        self::registerFonts($configuration->class, $font_dir);
 
         self::$registered = true;
     }
@@ -193,7 +191,7 @@ class ImagineCore {
         }
         array_push($dirs, dirname(__FILE__));
 
-        $current_path = preg_replace('/Imagine\/$/', '', __DIR__);
+        $current_path = preg_replace('/Imagine\/$/', '', dirname(__FILE__));
 
         foreach($dirs as $dir) {
             if(!in_array($dir, self::$registered_autoload_dirs)) {

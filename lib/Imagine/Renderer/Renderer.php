@@ -27,7 +27,7 @@
  */
 abstract class ImagineRendererRenderer {
 
-    public abstract function loadFile($filename);
+    public abstract function loadFile($filename = "");
 
     public abstract function saveFile($filename);
 
@@ -46,8 +46,7 @@ abstract class ImagineRendererRenderer {
 
     public function __construct($imagine) {
         if (false === self::$_core_initialized) {
-            $class = get_called_class();
-            call_user_func($class . '::initCore');
+            call_user_func(get_class($this).'::initCore');
         }
         $this->imagine = $imagine;
     }

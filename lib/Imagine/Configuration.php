@@ -33,7 +33,8 @@ class ImagineConfiguration {
             $settings = array(
                 "output" => "",
                 "input" => "",
-                "renderer" => "Gd"
+                "renderer" => "Gd",
+                'class' => 'Imagine'
             ),
             $protected_options = array();
     protected $options = array();

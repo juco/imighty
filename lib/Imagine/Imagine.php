@@ -37,6 +37,7 @@ class Imagine extends ImagineCore {
                 "text" => "ImagineLayerText"
         );
     }
+ 
 
     public static function configureFilters(){
         return array(
@@ -54,5 +55,8 @@ class Imagine extends ImagineCore {
     
     public static function configureAutoload(){
         return array();
+    }
+    public static function getClass() {
+      return get_class();
     }
 }

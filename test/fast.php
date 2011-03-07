@@ -1,10 +1,10 @@
 <?php
 
-require_once('../lib/Imagine/Imagine.php');
+require_once(dirname(__FILE__).'/../lib/Imagine/Imagine.php');
 
 Imagine::configuration(array(
-        "input" => __DIR__."/images/",
-        "output" => __DIR__."/thumbs/"
+        "input" => dirname(__FILE__)."/images/",
+        "output" => dirname(__FILE__)."/thumbs/"
 ));
 
 
@@ -13,7 +13,7 @@ $html = '<h1>HTML Ipsum Presents</h1>
          ';
 
 
-$text = Imagine::text()->
+$text = Imagine::getInstance()->text()->
         write($html)->
         width('100%')->
         padding('left', 20)->
@@ -31,7 +31,7 @@ $text = Imagine::text()->
         style('code', array())->
         style('strong', array('font_weight' => 'bold', 'background' => '#f00'));
 
-$include = Imagine::image()->
+$include = Imagine::getInstance()->image()->
         load("horizontal.jpg")->
         width('100%')->
         background('#000')->
@@ -41,7 +41,7 @@ $include = Imagine::image()->
         padding('bottom', 20)->
         crop();
 
-$image = Imagine::image()->
+$image = Imagine::getInstance()->image()->
         load("vertical.jpg")->
         append($text)->
         append($include)->
