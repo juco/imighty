@@ -142,9 +142,10 @@ class ImagineRendererGd extends ImagineRendererRenderer {
                 $this->rendered_data['type_string'] = 'image/jpeg';
                 break;
             case 'png':
+                $im = $this->getResource();
                 imagetruecolortopalette($im, false, 255);
                 imagesavealpha($im, true);
-                imagepng($this->getResource(), $new_filename);
+                imagepng($im, $new_filename);
                 $this->rendered_data['type_string'] = 'image/png';
                 break;
         }

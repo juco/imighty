@@ -71,16 +71,20 @@ abstract class ImagineBehaviourPositionable extends ImagineBehaviourSizable {
     }
 
     public function top(){
-        return $this->border('top', func_get_args());
+        $args = func_get_args();
+        return $this->border('top', $args);
     }
     public function left(){
-        return $this->border('left', func_get_args());
+        $args = func_get_args();
+        return $this->border('left', $args);
     }
     public function right(){
-        return $this->border('right', func_get_args());
+        $args = func_get_args();
+        return $this->border('right', $args);
     }
     public function bottom(){
-        return $this->border('bottom', func_get_args());
+        $args = func_get_args();
+        return $this->border('bottom', $args);
     }
 
     public function border($border,  $arguments) {
