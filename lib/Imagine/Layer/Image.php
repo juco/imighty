@@ -39,6 +39,9 @@ class ImagineLayerImage extends ImagineLayerLayer {
     public function load ($file_name = false) {
         $this->touch();
         $this->getRenderer()->loadFile($file_name);
+        $this->width = $this->getRenderer()->getWidth();
+        //echo $this->width;
+        $this->height = $this->getRenderer()->getHeight();
         return $this;
     }
 }
