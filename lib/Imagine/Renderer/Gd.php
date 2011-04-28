@@ -119,7 +119,7 @@ class ImagineRendererGd extends ImagineRendererRenderer {
         $this->original_data = $imagedata;
     }
 
-    public function saveFile($filename) {
+    public function saveFile($filename, $quality=75) {
         
         $configuration = $this->getConfiguration();
 
@@ -138,13 +138,14 @@ class ImagineRendererGd extends ImagineRendererRenderer {
         $path = pathinfo($new_filename);
         switch($path['extension']){
             case 'jpg':
-                imagejpeg($this->getResource(), $new_filename, 75);
+                imagejpeg($this->getResource(), $new_filename, $quality);
                 $this->rendered_data['type_string'] = 'image/jpeg';
                 break;
             case 'png':
+                $im = $this->getResource();
                 imagetruecolortopalette($im, false, 255);
                 imagesavealpha($im, true);
-                imagepng($this->getResource(), $new_filename);
+                imagepng($im, $new_filename);
                 $this->rendered_data['type_string'] = 'image/png';
                 break;
         }
