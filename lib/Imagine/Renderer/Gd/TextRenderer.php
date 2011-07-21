@@ -32,7 +32,7 @@ class ImagineRendererGdTextRenderer {
 
     public function __construct(ImagineRendererGd $renderer) {
         $this->renderer = $renderer;
-        $this->exp = 2;
+        $this->exp = 10;
     }
     /**
      *

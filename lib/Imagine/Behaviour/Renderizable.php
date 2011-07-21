@@ -93,19 +93,19 @@ abstract class ImagineBehaviourRenderizable {
     public function getRenderer() {
         return $this->renderer;
     }
-    public function save($filename) {
+    public function save($filename, $quality = 75) {
         if(false === $this->is_rendered) {
             $this->render();
         }
-        $this->getRenderer()->saveFile($filename);
+        $this->getRenderer()->saveFile($filename, $quality);
         return $this;
     }
-    public function toBrowser() {
+    public function toBrowser($quality = 75) {
         if(false === $this->is_rendered) {
             $this->render();
         }
         
-        $this->getRenderer()->toBrowser();
+        $this->getRenderer()->toBrowser($quality);
         return $this;
     }
     public function addToRenderStack($renderer) {
