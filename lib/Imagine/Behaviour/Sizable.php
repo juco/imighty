@@ -92,6 +92,12 @@ class ImagineBehaviourSizable extends ImagineBehaviourRenderizable {
         $this->touch();
         return $this;
     }
+    public function fit() {
+
+        $this->crop = "center";
+        $this->touch();
+        return $this;
+    }
 
     public function stretch() {
 
