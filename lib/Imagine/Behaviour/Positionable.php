@@ -143,7 +143,6 @@ abstract class ImagineBehaviourPositionable extends ImagineBehaviourSizable {
                 if(false === $this->$border) {
                     $opposite = $border;
                     $border = $temp;
-                    
                 }
                 unset($temp);
                 $boundaries[$border] = $this->$border + $options['operator'] * ($margins[$border] + $paddings[$border]);
