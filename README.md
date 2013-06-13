@@ -42,13 +42,14 @@ $image->save("vertical.jpg");
 To use (text)
 ---
 ```php
-$html = '
+$html = <<<HTML
 <h1>HTML Ipsum Presents</h1>
 <p>Hello, <br />Two line parragraph</p>
 <h1>Other Title</h1>
 <p> <strong>Pellentesque habitant morbi tristique</strong> senectus
 et netus et malesuada fames ac turpis egestas. <em>Aenean ultricies mi vitae est.</em>.
 <code>commodo vitae</code> <a href="#">orci, sagittis Donec non enime</a>.</p>';
+HTML;
 
 
 $text = Imagine::text()->
